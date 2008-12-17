@@ -288,7 +288,7 @@ novhold:
 
 
 	ldx	random1
-	lda	randomnumbers,x
+	lda	randomnumbers
 	sta	$210f
 	stz	$210f
 	
@@ -2419,7 +2419,9 @@ L00f815 cmp     $2140
 	rts     
 
 
-
+.BANK 1
+.ORG 0
+.SECTION "data"
 
 
 Colors:
@@ -2606,36 +2608,25 @@ vertsine:
 
 
 randomnumbers:
-	.db	$3AA7,$3ECB,$3A50,$9684,$6807,$6DBA,$0FA0
-	.dw	$C455,$722F,$3280,$630A,$A402,$244E,$3FF7,$FBB5
-	.dw	$83F4,$7210,$0165,$6688,$1248,$516B,$43BB,$E401
-	.dw	$656A,$7144,$7525,$C2AE,$E455,$B7A9,$9087,$5E33
-	.dw	$8C23,$002A,$33B1,$A61E,$1989,$E1AA,$FC54,$8A0B
-	.dw	$1722,$1FEE,$9226,$079B,$68D5,$1090,$FEC8,$3B4C
-	.dw	$10DA,$EF06,$A471,$46B7,$4D47,$1984,$3F3F,$FC58
-	.dw	$D0E2,$B601,$ECF3,$5647,$4113,$738B,$305F,$914A
-	.dw	$8665,$420B,$D45B,$8825,$F3B6,$F2C1,$ABEF,$96CA
-	.dw	$4BD7,$A1D4,$8D0C,$A6B1,$EF4C,$033E,$8FAF,$CE49
-	.dw	$4975,$72FD,$9552,$1366,$3FBE,$67F9,$61BF,$307C
-	.dw	$2B57,$0FBF,$05C1,$FAA3,$0E8E,$DA0D,$6BDA,$E101
-	.dw	$DF3D,$CBF2,$8C3A,$0D97,$BED5,$FAD5,$30D9,$361D
-	.dw	$9C81,$3C27,$5BBD,$45EE,$2C62,$8B21,$5424,$1976
-	.dw	$3D5B,$3778,$7599,$3EB8,$6A92,$3C30,$BF88,$2F27
-	.dw	$ABE4,$C50F,$256F,$15AF,$FB7C,$BF5C,$3407,$DCCE
-	.dw	$361A
+	.db	$3A,$A7,$3E,$CB,$3A,$50,$96,$84,$68,$07,$6D,$BA,$0F,$A0
+	.db	$C4,$55,$72,$2F,$32,$80,$63,$0A,$A4,$02,$24,$4E,$3F,$F7,$FB,$B5
+	.db	$83,$F4,$72,$10,$01,$65,$66,$88,$12,$48,$51,$6B,$43,$BB,$E4,$01
+	.db	$65,$6A,$71,$44,$75,$25,$C2,$AE,$E4,$55,$B7,$A9,$90,$87,$5E,$33
+	.db	$8C,$23,$00,$2A,$33,$B1,$A6,$1E,$19,$89,$E1,$AA,$FC,$54,$8A,$0B
+	.db	$17,$22,$1F,$EE,$92,$26,$07,$9B,$68,$D5,$10,$90,$FE,$C8,$3B,$4C
+	.db	$10,$DA,$EF,$06,$A4,$71,$46,$B7,$4D,$47,$19,$84,$3F,$3F,$FC,$58
+	.db	$D0,$E2,$B6,$01,$EC,$F3,$56,$47,$41,$13,$73,$8B,$30,$5F,$91,$4A
+	.db	$86,$65,$42,$0B,$D4,$5B,$88,$25,$F3,$B6,$F2,$C1,$AB,$EF,$96,$CA
+	.db	$4B,$D7,$A1,$D4,$8D,$0C,$A6,$B1,$EF,$4C,$03,$3E,$8F,$AF,$CE,$49
+	.db	$49,$75,$72,$FD,$95,$52,$13,$66,$3F,$BE,$67,$F9,$61,$BF,$30,$7C
+	.db	$2B,$57,$0F,$BF,$05,$C1,$FA,$A3,$0E,$8E,$DA,$0D,$6B,$DA,$E1,$01
+	.db	$DF,$3D,$CB,$F2,$8C,$3A,$0D,$97,$BE,$D5,$FA,$D5,$30,$D9,$36,$1D
+	.db	$9C,$81,$3C,$27,$5B,$BD,$45,$EE,$2C,$62,$8B,$21,$54,$24,$19,$76
+	.db	$3D,$5B,$37,$78,$75,$99,$3E,$B8,$6A,$92,$3C,$30,$BF,$88,$2F,$27
+	.db	$AB,$E4,$C5,$0F,$25,$6F,$15,$AF,$FB,$7C,$BF,$5C,$34,$07,$DC,$CE
+	.db	$36,$1A
 
 
-staticgfx:
-	.INCBIN	"static2.dat"
-atxgfx:
-	.INCBIN	"logofont.rnc"	; both files packed into one
-atxtile:
-	.INCBIN	"atxchar.rnc"
-sprtgfx:
-	.INCBIN "scroll.rnc"
-
-music:
-	.INCBIN	"atxchip4.rnc"
 bottext:
 
 	.db	    $10,"     Intro Coded By: -Pan-      "
@@ -2777,6 +2768,23 @@ Max:
 Begin:                             
         .db    2,4,4,1,0,1,1,1,3,0,0,0,1  
 
+.ends
+
+.BANK 1
+.ORG 0
+.SECTION "GFX"
+staticgfx:
+	.INCBIN	"static2.dat"
+atxgfx:
+	.INCBIN	"logofont.rnc"	; both files packed into one
+atxtile:
+	.INCBIN	"atxchar.rnc"
+sprtgfx:
+	.INCBIN "scroll.rnc"
+
+music:
+	.INCBIN	"atxchip4.rnc"
+.ends
 
 
 Slow:
