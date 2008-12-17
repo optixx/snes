@@ -1,6 +1,5 @@
-;	heap	O=512k			;max 128k object buffer                
+;	heap	O=512k		;max 128k object buffer                
 ;	size	8			;4 32kblocks                          
-;                                                                                  
 ;	SMC+				;yes, we want a smc header            
 ;	lrom				;yes, please split in 32k hunks       
 
@@ -41,7 +40,7 @@
 .EQU cst2			ssh4+2
 .EQU sst6			cst2+2
 .EQU sms8			sst6+2
-.EQU ssa			ksms8+2
+.EQU ssa			sms8+2
 .EQU scs			ssa+2
 .EQU sinedir		scs+2
 .EQU scrpal			sinedir+2
@@ -111,9 +110,9 @@ Start:
 	pla
 	;lda	#^Picture1		; CRUNCHED FILE BANK
 	sta	$67
-	ldx	#UnpackBuffr		; LOW WORD UNPACK BUFFER
+	ldx	#$0000		; LOW WORD UNPACK BUFFER
 	stx	$68
-	lda	#^UnpackBuffr		; UNPACK BUFFER BANK
+	lda	#$7f		; UNPACK BUFFER BANK
 	pha
 	plb
 	jsr	UNPACK				;Requires A[8] XY[16]
@@ -584,11 +583,11 @@ Watblank4:
 
 
 list212c:
-	dc.b	1,0
-	dc.b	$7f,$2
-	dc.b	$7f,$2
-	dc.b	1,0
-	dc.b	0,0
+	.db	1,0
+	.db	$7f,$2
+	.db	$7f,$2
+	.db	1,0
+	.db	0,0
 
 
 
@@ -785,11 +784,11 @@ readtext:
 
 	ldx	cst2
 	lda	scrolltext,x
-	cmp	#"#"
+	cmp	#'#'
 	beq	leftright
-	cmp	#"$"
+	cmp	#'$'
 	beq	rightleft
-	cmp	#"%"
+	cmp	#'%'
 	beq	paleffect
 	cmp	#$00
 	beq	endscroll
@@ -900,9 +899,9 @@ stopfading:
 	rts
 
 bottommosaic:
-	dc.b	$11,$21,$31,$41,$51,$61,$71,$81,$91,$a1,$b1,$c1,$d1
-	dc.b	$e1,$f1
-	dc.b	$e1,$d1,$c1,$b1,$a1,$91,$81,$71,$61,$51,$41,$31,$21,$11,$01
+	.db	$11,$21,$31,$41,$51,$61,$71,$81,$91,$a1,$b1,$c1,$d1
+	.db	$e1,$f1
+	.db	$e1,$d1,$c1,$b1,$a1,$91,$81,$71,$61,$51,$41,$31,$21,$11,$01
 
 
 
@@ -1235,8 +1234,8 @@ writefadeoffset:
 	rts
 
 fadingcolors:
-	dc.b	4,5,6,7,8,9,$a,$b,$c,$d,$e,$f,$e,$d,$c,$b,$a,9,8,7,6,5,4,3
-	dc.b	2,1,0,1,2,3
+	.db	4,5,6,7,8,9,$a,$b,$c,$d,$e,$f,$e,$d,$c,$b,$a,9,8,7,6,5,4,3
+	.db	2,1,0,1,2,3
 
 
 
@@ -1337,9 +1336,9 @@ copystaticgfx:
 	pla
 	;lda	#^Picture1		; CRUNCHED FILE BANK
 	sta	$67
-	ldx	#UnpackBuffr		; LOW WORD UNPACK BUFFER
+	ldx	#$0000		; LOW WORD UNPACK BUFFER
 	stx	$68
-	lda	#^UnpackBuffr		; UNPACK BUFFER BANK
+	lda	#$7f		; UNPACK BUFFER BANK
 	pha
 	plb
 	jsr	UNPACK				;Requires A[8] XY[16]
@@ -1375,9 +1374,9 @@ copyatxgfx:
 	pla
 	;lda	#^Picture1		; CRUNCHED FILE BANK
 	sta	$67
-	ldx	#UnpackBuffr		; LOW WORD UNPACK BUFFER
+	ldx	#$0000		; LOW WORD UNPACK BUFFER
 	stx	$68
-	lda	#^UnpackBuffr		; UNPACK BUFFER BANK
+	lda	#$7f		; UNPACK BUFFER BANK
 	pha
 	plb
 	jsr	UNPACK				;Requires A[8] XY[16]
@@ -1468,9 +1467,9 @@ copystatictile:
 	pla
 	;lda	#^Picture1		; CRUNCHED FILE BANK
 	sta	$67
-	ldx	#UnpackBuffr		; LOW WORD UNPACK BUFFER
+	ldx	#$0000		; LOW WORD UNPACK BUFFER
 	stx	$68
-	lda	#^UnpackBuffr		; UNPACK BUFFER BANK
+	lda	#$7f		; UNPACK BUFFER BANK
 	pha
 	plb
 	jsr	UNPACK				;Requires A[8] XY[16]
@@ -1797,28 +1796,28 @@ copy2106list:
 	rts
 
 list2129:	
-	dc.b	$57,0,$48,$00,$1,$0,$0,$0
+	.db	$57,0,$48,$00,$1,$0,$0,$0
 
 list2132:
-	dc.b	$77,%11100111
-	dc.b	$8,$0		;%11100111
-	dc.b	$8,%11100111
-	dc.b	$0,0,0,$0,$0
+	.db	$77,%11100111
+	.db	$8,$0		;%11100111
+	.db	$8,%11100111
+	.db	$0,0,0,$0,$0
 
 list210d:
-	dc.b	$57,$00,$01,$00,$01
-	dc.b	$48,$00,$01,$88,$00	; yay
-	dc.b	$8,$00,$01,$00,$01
-	dc.b	$10,$00,$01,$d8,0		:<-bot text
-	dc.b	$01,$00,$01,$00,$01,0,0,0,0
+	.db	$57,$00,$01,$00,$01
+	.db	$48,$00,$01,$88,$00	; yay
+	.db	$8,$00,$01,$00,$01
+	.db	$10,$00,$01,$d8,0		:<-bot text
+	.db	$01,$00,$01,$00,$01,0,0,0,0
 
 list2106:
-	dc.b	$57,$00,$79
-	dc.b	$48,$00,$71
-	dc.b	$08,$00,$79
-	dc.b	$10,$00,$69		;x1<mosaic line 
-	dc.b	$01,$00,$79
-	dc.b	$0,$0,$0
+	.db	$57,$00,$79
+	.db	$48,$00,$71
+	.db	$08,$00,$79
+	.db	$10,$00,$69		;x1<mosaic line 
+	.db	$01,$00,$79
+	.db	$0,$0,$0
 
 
 
@@ -2107,12 +2106,12 @@ unpack13	sta	temp1
 	ora	temp1
 	sta	bitbufl
 unpack14	dec	counts
-	beq	.Mark1
+	beq	Mark1
 	jmp	unpack3
-.Mark1	dec	blocks
-	beq	.Mark2
+Mark1	dec	blocks
+	beq	Mark2
 	jmp	unpack2
-.Mark2	rts
+Mark2	rts
 ;-----------------------------------------------------------
 gtval	ldx	bitbufl
 	bra	gtval3
@@ -2148,22 +2147,22 @@ gtval3	txa
 	ora	bittab,x		;>
 	plb
 gtval4	rts
-bittab	dcr.w	1
-	dcr.w	2
-	dcr.w	4
-	dcr.w	8
-	dcr.w	$10
-	dcr.w	$20
-	dcr.w	$40
-	dcr.w	$80
-	dcr.w	$100
-	dcr.w	$200
-	dcr.w	$400
-	dcr.w	$800
-	dcr.w	$1000
-	dcr.w	$2000
-	dcr.w	$4000
-	dcr.w	$8000
+bittab	.dw	1
+	.dw	2
+	.dw	4
+	.dw	8
+	.dw	$10
+	.dw	$20
+	.dw	$40
+	.dw	$80
+	.dw	$100
+	.dw	$200
+	.dw	$400
+	.dw	$800
+	.dw	$1000
+	.dw	$2000
+	.dw	$4000
+	.dw	$8000
 ;-----------------------------------------------------------
 gtbits	tay
 	asl	a
@@ -2200,23 +2199,23 @@ gtbits4	dex
 	sta	bitbufh
 	pla
 gtbits5	rts
-msktab	dcr.w	0
-	dcr.w	1
-	dcr.w	3
-	dcr.w	7
-	dcr.w	$f
-	dcr.w	$1f
-	dcr.w	$3f
-	dcr.w	$7f
-	dcr.w	$ff
-	dcr.w	$1ff
-	dcr.w	$3ff
-	dcr.w	$7ff
-	dcr.w	$fff
-	dcr.w	$1fff
-	dcr.w	$3fff
-	dcr.w	$7fff
-	dcr.w	$ffff
+msktab	.dw	0
+	.dw	1
+	.dw	3
+	.dw	7
+	.dw	$f
+	.dw	$1f
+	.dw	$3f
+	.dw	$7f
+	.dw	$ff
+	.dw	$1ff
+	.dw	$3ff
+	.dw	$7ff
+	.dw	$fff
+	.dw	$1fff
+	.dw	$3fff
+	.dw	$7fff
+	.dw	$ffff
 ;-----------------------------------------------------------
 makehuff	sty	temp4
 	lda	#5
@@ -2308,17 +2307,17 @@ makehuff8	iny
 
 
 
-MOFF	equ	$0200	;stop music 
-MBONUS	equ	$0201	;timer bonus countdown
-MCHEAT	equ	$0202	;cheat mode enabled
-MCLICK	equ	$0203	;button click
-MOVER	equ	$0204	;game over/time up
-MTRING	equ	$0205	;tring for startup of the wildcard
-MSOLVED	equ	$0206	;puzzle solved tune
-MTUNE	equ	$0207	;New tune....
-MWINDOW	equ	$0208	;Open selection window
-MSELECT	equ	$0209	;Move cursor up and down
-MRESET	equ	$0400	; reset the music controller
+.EQU MOFF		$0200	;stop music 
+.EQU MBONUS		$0201	;timer bonus countdown
+.EQU MCHEAT		$0202	;cheat mode enabled
+.EQU MCLICK		$0203	;button click
+.EQU MOVER		$0204	;game over/time up
+.EQU MTRING		$0205	;tring for startup of the wildcard
+.EQU MSOLVED	$0206	;puzzle solved tune
+.EQU MTUNE		$0207	;New tune....
+.EQU MWINDOW	$0208	;Open selection window
+.EQU MSELECT	$0209	;Move cursor up and down
+.EQU MRESET		$0400	; reset the music controller
 
 tune	rep #$30
 	;lda #MTUNE
@@ -2427,270 +2426,265 @@ Colors:
 
 	; static colors (grey)
 
-	dc.w	$0000,$4208,$8410,$C618,$0821,$4A29,$8C31,$CE39
-	dc.w	$1042,$524A,$9452,$D65A,$1863,$5A6B,$9C73,$FF7F 
+	.dw	$0000,$4208,$8410,$C618,$0821,$4A29,$8C31,$CE39
+	.dw	$1042,$524A,$9452,$D65A,$1863,$5A6B,$9C73,$FF7F 
  
 
 	; atx colors (greys/blues..)
 
-	dcr.w	$4631,$1888,$739C,$6B58,$6316,$5AD4,$5A92,$5250
-	dcr.w	$4A0E,$420C,$41CC,$39CA,$398A,$2988,$2946,$20C4 
+	.dw	$4631,$1888,$739C,$6B58,$6316,$5AD4,$5A92,$5250
+	.dw	$4A0E,$420C,$41CC,$39CA,$398A,$2988,$2946,$20C4 
 
 	; font colors 
 	;                   orange
-	dcr.w	$4210,$739C,$675C,$5F1B,$52DB,$4ABA,$3E79,$3639
-	dcr.w	$2DF8,$25D8,$1D97,$1577,$0D36,$0515,$00F5,$18c6
+	.dw	$4210,$739C,$675C,$5F1B,$52DB,$4ABA,$3E79,$3639
+	.dw	$2DF8,$25D8,$1D97,$1577,$0D36,$0515,$00F5,$18c6
 	;                   blue
-	dcr.w	$4210,$739C,$737A,$6F38,$6EF6,$6AD3,$6691,$664F
-	dcr.w	$622D,$61EB,$5DA8,$5D86,$5944,$5902,$54E0,$0000
+	.dw	$4210,$739C,$737A,$6F38,$6EF6,$6AD3,$6691,$664F
+	.dw	$622D,$61EB,$5DA8,$5D86,$5944,$5902,$54E0,$0000
 	;                   cyan
-	dcr.w	$4210,$739C,$6F7A,$6758,$5F36,$5B14,$52F1,$4ACF
-	dcr.w	$468D,$3E6B,$3648,$3226,$2A04,$21E2,$1DC0,$0000
+	.dw	$4210,$739C,$6F7A,$6758,$5F36,$5B14,$52F1,$4ACF
+	.dw	$468D,$3E6B,$3648,$3226,$2A04,$21E2,$1DC0,$0000
 	;		    red
-	dcr.w	$4210,$7FFF,$7BBF,$737E,$6F1E,$66DD,$627C,$5A3C
-	dcr.w	$55DB,$4D9B,$493A,$40F9,$3C99,$3458,$3018,$0000 
+	.dw	$4210,$7FFF,$7BBF,$737E,$6F1E,$66DD,$627C,$5A3C
+	.dw	$55DB,$4D9B,$493A,$40F9,$3C99,$3458,$3018,$0000 
 	;		    yellow
-	dcr.w	$4210,$7FFF,$77DF,$6FBE,$637D,$5B5C,$533B,$4AFA
-	dcr.w	$3ED9,$36B8,$2E77,$2656,$1A15,$11F5,$09D4,$0000 
+	.dw	$4210,$7FFF,$77DF,$6FBE,$637D,$5B5C,$533B,$4AFA
+	.dw	$3ED9,$36B8,$2E77,$2656,$1A15,$11F5,$09D4,$0000 
 	;			; green
-	dcr.w	$4210,$6BFF,$63DE,$5BBC,$539B,$4B79,$4358,$3B36
-	dcr.w	$3314,$2AF3,$22B1,$1A90,$126E,$0A4D,$022B,$0000 
+	.dw	$4210,$6BFF,$63DE,$5BBC,$539B,$4B79,$4358,$3B36
+	.dw	$3314,$2AF3,$22B1,$1A90,$126E,$0A4D,$022B,$0000 
 	;		sprite colors
 	;                   yellow
-	dcr.w	$0000,$0193,$7FFF,$6739,$033F,$02FF,$02BD,$027B
-	dcr.w	$0239,$01D7,$0195,$0153,$0111,$00CE,$008C,$000A 
+	.dw	$0000,$0193,$7FFF,$6739,$033F,$02FF,$02BD,$027B
+	.dw	$0239,$01D7,$0195,$0153,$0111,$00CE,$008C,$000A 
 	;	
-	dcr.w	$0000,$02EF,$7FFF,$6739,$03FF,$03BD,$037A,$0337
-	dcr.w	$02D4,$0291,$024E,$020B,$01A8,$0165,$0123,$00E0 
+	.dw	$0000,$02EF,$7FFF,$6739,$03FF,$03BD,$037A,$0337
+	.dw	$02D4,$0291,$024E,$020B,$01A8,$0165,$0123,$00E0 
 	;
-	dcr.w	$0000,$5A40,$7FFF,$6739,$7FE0,$77A0,$6F40,$66E0
-	dcr.w	$5EA0,$5240,$49E0,$41A0,$3940,$2CE0,$24A0,$1C40 
+	.dw	$0000,$5A40,$7FFF,$6739,$7FE0,$77A0,$6F40,$66E0
+	.dw	$5EA0,$5240,$49E0,$41A0,$3940,$2CE0,$24A0,$1C40 
 	;
-	dcr.w	$0000,$01DB,$7FFF,$6739,$3B3F,$36DE,$329D,$2A5B
-	dcr.w	$261A,$21B9,$1977,$1536,$10D5,$0893,$0452,$0010 
+	.dw	$0000,$01DB,$7FFF,$6739,$3B3F,$36DE,$329D,$2A5B
+	.dw	$261A,$21B9,$1977,$1536,$10D5,$0893,$0452,$0010 
 	;
-	dcr.w	$0000,$4AFB,$7FFF,$6739,$3B3F,$3ADE,$3E9D,$3E5B
-	dcr.w	$3E1A,$3DB9,$3D77,$4136,$40D5,$4093,$4052,$4010 
+	.dw	$0000,$4AFB,$7FFF,$6739,$3B3F,$3ADE,$3E9D,$3E5B
+	.dw	$3E1A,$3DB9,$3D77,$4136,$40D5,$4093,$4052,$4010 
 	;
-	dcr.w	$0000,$6718,$7FFF,$6739,$739C,$6F5A,$6718,$5ED5
-	dcr.w	$5693,$5251,$4A0F,$41CD,$3D8A,$3548,$2D06,$28C4 
+	.dw	$0000,$6718,$7FFF,$6739,$739C,$6F5A,$6718,$5ED5
+	.dw	$5693,$5251,$4A0F,$41CD,$3D8A,$3548,$2D06,$28C4 
 	;
-	dcr.w	$0000,$6718,$7FFF,$6739,$6B7C,$631C,$5EDC,$5A7C
-	dcr.w	$563C,$51DB,$4D9B,$493B,$44FB,$3CBB,$385B,$341B 
+	.dw	$0000,$6718,$7FFF,$6739,$6B7C,$631C,$5EDC,$5A7C
+	.dw	$563C,$51DB,$4D9B,$493B,$44FB,$3CBB,$385B,$341B 
 	;
-	dcr.w	$0000,$4E99,$7FFF,$6739,$6B7C,$5F3B,$56FA,$4E99
-	dcr.w	$4258,$3A18,$2DD7,$2596,$1D55,$1114,$08D3,$0092 
+	.dw	$0000,$4E99,$7FFF,$6739,$6B7C,$5F3B,$56FA,$4E99
+	.dw	$4258,$3A18,$2DD7,$2596,$1D55,$1114,$08D3,$0092 
 
  
 
 fontpos:
-	dc.b	0	;SP
-	dc.b	$a	;!
-	dc.b	$c	;"
-	dc.b	0	;#
-	dc.b	0 	;$
-	dc.b	0 	;%
-	dc.b	$2a	;&
-	dc.b	$2	;'
-	dc.b	$4	;(
-	dc.b	$6	;)
-	dc.b	$28	;* HE
-	dc.b	$2a	;+
-	dc.b	$2c	;,
-	dc.b	$2e	;-
-	dc.b	$0e	;.
-	dc.b	$00	;/
-	dc.b	$20	;0
-	dc.b	$22	;1
-	dc.b	$24	;2
-	dc.b	$26	;3
-	dc.b	$48	;4
-	dc.b	$4a	;5
-	dc.b	$4c	;6
-	dc.b	$4e	;7
-	dc.b	$60	;8
-	dc.b	$62	;9
-	dc.b	$40	;:
-	dc.b	$40	;;
-	dc.b	$4	;<
-	dc.b	$46	;=
-	dc.b	$6	;>
-	dc.b	$6c	;?
-	dc.b	$00	;@
-	dc.b	$80	;A
-	dc.b	$82	;B
-	dc.b	$84	;C
-	dc.b	$64	;D
-	dc.b	$66	;E
-	dc.b	$68	;F
-	dc.b	$6a	;G
-	dc.b	$8e	;H
-	dc.b	$a0	;I
-	dc.b	$a2	;J
-	dc.b	$a4	;k
-	dc.b	$a6	;l
-	dc.b	$a8	;m
-	dc.b	$86	;n
-	dc.b	$88	;o
-	dc.b	$8a	;p
-	dc.b	$8c	;q
-	dc.b	$c0	;r
-	dc.b	$c2	;s
-	dc.b	$c4	;t
-	dc.b	$c6	;u
-	dc.b	$c8	;v
-	dc.b	$ca	;w
-	dc.b	$aa	;x
-	dc.b	$ac	;y
-	dc.b	$ae	;z
+	.db	0	;SP
+	.db	$a	;!
+	.db	$c	;"
+	.db	0	;#
+	.db	0 	;$
+	.db	0 	;%
+	.db	$2a	;&
+	.db	$2	;'
+	.db	$4	;(
+	.db	$6	;)
+	.db	$28	;* HE
+	.db	$2a	;+
+	.db	$2c	;,
+	.db	$2e	;-
+	.db	$0e	;.
+	.db	$00	;/
+	.db	$20	;0
+	.db	$22	;1
+	.db	$24	;2
+	.db	$26	;3
+	.db	$48	;4
+	.db	$4a	;5
+	.db	$4c	;6
+	.db	$4e	;7
+	.db	$60	;8
+	.db	$62	;9
+	.db	$40	;:
+	.db	$40	;;
+	.db	$4	;<
+	.db	$46	;=
+	.db	$6	;>
+	.db	$6c	;?
+	.db	$00	;@
+	.db	$80	;A
+	.db	$82	;B
+	.db	$84	;C
+	.db	$64	;D
+	.db	$66	;E
+	.db	$68	;F
+	.db	$6a	;G
+	.db	$8e	;H
+	.db	$a0	;I
+	.db	$a2	;J
+	.db	$a4	;k
+	.db	$a6	;l
+	.db	$a8	;m
+	.db	$86	;n
+	.db	$88	;o
+	.db	$8a	;p
+	.db	$8c	;q
+	.db	$c0	;r
+	.db	$c2	;s
+	.db	$c4	;t
+	.db	$c6	;u
+	.db	$c8	;v
+	.db	$ca	;w
+	.db	$aa	;x
+	.db	$ac	;y
+	.db	$ae	;z
  
 
-YES:	dc.b	"YES"
+YES:	.db	"YES"
 
 NO:
-	dc.b	"NO "
+	.db	"NO "
 
 LOW:
-	dc.b	0,0,0,0
-	dc.b	0,0,0,1
-	dc.b	0,0,0,2
-	dc.b	0,0,0,3
-	dc.b	0,0,0,4
-	dc.b	0,0,0,5
-	dc.b	0,0,0,6
-	dc.b	0,0,0,7
-	dc.b	0,0,0,8
-	dc.b	0,0,0,9
-	dc.b	0,0,1,0
-	dc.b	0,0,1,1
-	dc.b	0,0,1,2
-	dc.b	0,0,1,3
-	dc.b	0,0,1,4
-	dc.b	0,0,1,5
+	.db	0,0,0,0
+	.db	0,0,0,1
+	.db	0,0,0,2
+	.db	0,0,0,3
+	.db	0,0,0,4
+	.db	0,0,0,5
+	.db	0,0,0,6
+	.db	0,0,0,7
+	.db	0,0,0,8
+	.db	0,0,0,9
+	.db	0,0,1,0
+	.db	0,0,1,1
+	.db	0,0,1,2
+	.db	0,0,1,3
+	.db	0,0,1,4
+	.db	0,0,1,5
 	
 HIGH:
-	dc.b	0,0,0,0
-	dc.b	0,0,1,6
-	dc.b	0,0,3,2
-	dc.b	0,0,4,8
-	dc.b	0,0,6,4
-	dc.b	0,0,8,0
-	dc.b	0,0,9,6
-	dc.b	0,1,1,2
-	dc.b	0,1,2,8
-	dc.b	0,1,4,4
-	dc.b	0,1,6,0
-	dc.b	0,1,7,6
-	dc.b	0,1,9,2
-	dc.b	0,2,0,8
-	dc.b	0,2,2,4
-	dc.b	0,2,4,0
+	.db	0,0,0,0
+	.db	0,0,1,6
+	.db	0,0,3,2
+	.db	0,0,4,8
+	.db	0,0,6,4
+	.db	0,0,8,0
+	.db	0,0,9,6
+	.db	0,1,1,2
+	.db	0,1,2,8
+	.db	0,1,4,4
+	.db	0,1,6,0
+	.db	0,1,7,6
+	.db	0,1,9,2
+	.db	0,2,0,8
+	.db	0,2,2,4
+	.db	0,2,4,0
 
 
 vertsine:
 
- dc.b  24,25,25,26,26,27,28,28,29,29,30,30,31,32,32,33,33,34,34,35
- dc.b  35,36,36,37,37,38,38,39,39,40,40,41,41,41,42,42,43,43,43,44
- dc.b  44,44,45,45,45,45,46,46,46,46,47,47,47,47,47,47,48,48,48,48
- dc.b  48,48,48,48,48,48,48,48,48,48,48,48,48,47,47,47,47,47,47,46
- dc.b  46,46,46,45,45,45,45,44,44,44,43,43,43,42,42,41,41,41,40,40
- dc.b  39,39,38,38,37,37,36,36,35,35,34,34,33,33,32,32,31,30,30,29
- dc.b  29,28,28,27,26,26,25,25,24,23,23,22,22,21,20,20,19,19,18,18
- dc.b  17,16,16,15,15,14,14,13,13,12,12,11,11,10,10,9,9,8,8,7,7,7
- dc.b  6,6,5,5,5,4,4,4,3,3,3,3,2,2,2,2,1,1,1,1,1,1,0,0,0,0,0,0,0,0
- dc.b  0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,5,5,5,6
- dc.b  6,7,7,7,8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15,16,16,17
- dc.b  18,18,19,19,20,20,21,22,22,23,23
+ .db  24,25,25,26,26,27,28,28,29,29,30,30,31,32,32,33,33,34,34,35
+ .db  35,36,36,37,37,38,38,39,39,40,40,41,41,41,42,42,43,43,43,44
+ .db  44,44,45,45,45,45,46,46,46,46,47,47,47,47,47,47,48,48,48,48
+ .db  48,48,48,48,48,48,48,48,48,48,48,48,48,47,47,47,47,47,47,46
+ .db  46,46,46,45,45,45,45,44,44,44,43,43,43,42,42,41,41,41,40,40
+ .db  39,39,38,38,37,37,36,36,35,35,34,34,33,33,32,32,31,30,30,29
+ .db  29,28,28,27,26,26,25,25,24,23,23,22,22,21,20,20,19,19,18,18
+ .db  17,16,16,15,15,14,14,13,13,12,12,11,11,10,10,9,9,8,8,7,7,7
+ .db  6,6,5,5,5,4,4,4,3,3,3,3,2,2,2,2,1,1,1,1,1,1,0,0,0,0,0,0,0,0
+ .db  0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,5,5,5,6
+ .db  6,7,7,7,8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15,16,16,17
+ .db  18,18,19,19,20,20,21,22,22,23,23
 
 
  
 
 
 randomnumbers:
-	dc.w	$3AA7,$3ECB,$3A50,$9684,$6807,$6DBA,$0FA0
-	dc.w	$C455,$722F,$3280,$630A,$A402,$244E,$3FF7,$FBB5
-	dc.w	$83F4,$7210,$0165,$6688,$1248,$516B,$43BB,$E401
-	dc.w	$656A,$7144,$7525,$C2AE,$E455,$B7A9,$9087,$5E33
-	dc.w	$8C23,$002A,$33B1,$A61E,$1989,$E1AA,$FC54,$8A0B
-	dc.w	$1722,$1FEE,$9226,$079B,$68D5,$1090,$FEC8,$3B4C
-	dc.w	$10DA,$EF06,$A471,$46B7,$4D47,$1984,$3F3F,$FC58
-	dc.w	$D0E2,$B601,$ECF3,$5647,$4113,$738B,$305F,$914A
-	dc.w	$8665,$420B,$D45B,$8825,$F3B6,$F2C1,$ABEF,$96CA
-	dc.w	$4BD7,$A1D4,$8D0C,$A6B1,$EF4C,$033E,$8FAF,$CE49
-	dc.w	$4975,$72FD,$9552,$1366,$3FBE,$67F9,$61BF,$307C
-	dc.w	$2B57,$0FBF,$05C1,$FAA3,$0E8E,$DA0D,$6BDA,$E101
-	dc.w	$DF3D,$CBF2,$8C3A,$0D97,$BED5,$FAD5,$30D9,$361D
-	dc.w	$9C81,$3C27,$5BBD,$45EE,$2C62,$8B21,$5424,$1976
-	dc.w	$3D5B,$3778,$7599,$3EB8,$6A92,$3C30,$BF88,$2F27
-	dc.w	$ABE4,$C50F,$256F,$15AF,$FB7C,$BF5C,$3407,$DCCE
-	dc.w	$361A
+	.db	$3AA7,$3ECB,$3A50,$9684,$6807,$6DBA,$0FA0
+	.dw	$C455,$722F,$3280,$630A,$A402,$244E,$3FF7,$FBB5
+	.dw	$83F4,$7210,$0165,$6688,$1248,$516B,$43BB,$E401
+	.dw	$656A,$7144,$7525,$C2AE,$E455,$B7A9,$9087,$5E33
+	.dw	$8C23,$002A,$33B1,$A61E,$1989,$E1AA,$FC54,$8A0B
+	.dw	$1722,$1FEE,$9226,$079B,$68D5,$1090,$FEC8,$3B4C
+	.dw	$10DA,$EF06,$A471,$46B7,$4D47,$1984,$3F3F,$FC58
+	.dw	$D0E2,$B601,$ECF3,$5647,$4113,$738B,$305F,$914A
+	.dw	$8665,$420B,$D45B,$8825,$F3B6,$F2C1,$ABEF,$96CA
+	.dw	$4BD7,$A1D4,$8D0C,$A6B1,$EF4C,$033E,$8FAF,$CE49
+	.dw	$4975,$72FD,$9552,$1366,$3FBE,$67F9,$61BF,$307C
+	.dw	$2B57,$0FBF,$05C1,$FAA3,$0E8E,$DA0D,$6BDA,$E101
+	.dw	$DF3D,$CBF2,$8C3A,$0D97,$BED5,$FAD5,$30D9,$361D
+	.dw	$9C81,$3C27,$5BBD,$45EE,$2C62,$8B21,$5424,$1976
+	.dw	$3D5B,$3778,$7599,$3EB8,$6A92,$3C30,$BF88,$2F27
+	.dw	$ABE4,$C50F,$256F,$15AF,$FB7C,$BF5C,$3407,$DCCE
+	.dw	$361A
 
 
 staticgfx:
-	.bin	static2.dat
+	.INCBIN	"static2.dat"
 atxgfx:
-	;.bin	atx_logo.rnc
-	;.bin	font.rnc
-	.bin	logofont.rnc	; both files packed into one
+	.INCBIN	"logofont.rnc"	; both files packed into one
 atxtile:
-	;.bin	atx_logo.char
-	.bin	atxchar.rnc
+	.INCBIN	"atxchar.rnc"
 sprtgfx:
-	.bin	scroll.rnc
+	.INCBIN "scroll.rnc"
 
 music:
-	;.bin	atxchip3.rnc
-	.bin	atxchip4.rnc
+	.INCBIN	"atxchip4.rnc"
 bottext:
 
-		;********************************
-	text	$10,"     Intro Coded By: -Pan-      "
-	text	$10," Music Composed By: The Doctor  "
+	.db	    $10,"     Intro Coded By: -Pan-      "
+	.db	$10," Music Composed By: The Doctor  "
 
-	text	$14,"       U.S.S. Enterprise        "
-	text	$14,"  412-233-2611  Sysop: Picard   "
+	.db	$14,"       U.S.S. Enterprise        "
+	.db	$14,"  412-233-2611  Sysop: Picard   "
 
-	text	$18,"     Intro Coded By: -Pan-      "
-	text	$18," Music Composed By: The Doctor  "
+	.db	$18,"     Intro Coded By: -Pan-      "
+	.db	$18," Music Composed By: The Doctor  "
 
-	text	$1c,"           Trade Line           "
-	text	$1c," 514-966-9569 Sysop: Wild Fire  "
+	.db	$1c,"           Trade Line           "
+	.db	$1c," 514-966-9569 Sysop: Wild Fire  "
 
-	text	$10,"     Intro Coded By: -Pan-      "
-	text	$10," Music Composed By: The Doctor  "
+	.db	$10,"     Intro Coded By: -Pan-      "
+	.db	$10," Music Composed By: The Doctor  "
 
-	text	$14,"            Dial Hard           "
-	text	$14,"  +41-7350-0155   Sysop: Fury   "
+	.db	$14,"            Dial Hard           "
+	.db	$14,"  +41-7350-0155   Sysop: Fury   "
 
-	text	$18,"     Intro Coded By: -Pan-      "
-	text	$18," Music Composed By: The Doctor  "
+	.db	$18,"     Intro Coded By: -Pan-      "
+	.db	$18," Music Composed By: The Doctor  "
 
-	text	$1c,"              Synergy           "
-	text	$1c," +49-PRIVATE Sysop: Sigma Seven "
+	.db	$1c,"              Synergy           "
+	.db	$1c," +49-PRIVATE Sysop: Sigma Seven "
 
-	text	$10,"     Intro Coded By: -Pan-      "
-	text	$10," Music Composed By: The Doctor  "
+	.db	$10,"     Intro Coded By: -Pan-      "
+	.db	$10," Music Composed By: The Doctor  "
 
-	text	$14,"       U.S.S. Enterprise        "
-	text	$14,"  412-233-2611  Sysop: Picard   "
+	.db	$14,"       U.S.S. Enterprise        "
+	.db	$14,"  412-233-2611  Sysop: Picard   "
 
-	text	$18,"     Intro Coded By: -Pan-      "
-	text	$18," Music Composed By: The Doctor  "
+	.db	$18,"     Intro Coded By: -Pan-      "
+	.db	$18," Music Composed By: The Doctor  "
 
-	text	$1c,"           Trade Line           "
-	text	$1c," 514-966-9569 Sysop: Wild Fire  "
+	.db	$1c,"           Trade Line           "
+	.db	$1c," 514-966-9569 Sysop: Wild Fire  "
 
-	text	$10,"     Intro Coded By: -Pan-      "
-	text	$10," Music Composed By: The Doctor  "
+	.db	$10,"     Intro Coded By: -Pan-      "
+	.db	$10," Music Composed By: The Doctor  "
 
-	text	$14,"            Dial Hard           "
-	text	$14,"  +41-7350-0155   Sysop: Fury   "
+	.db	$14,"            Dial Hard           "
+	.db	$14,"  +41-7350-0155   Sysop: Fury   "
 
-	text	$18,"     Intro Coded By: -Pan-      "
-	text	$18," Music Composed By: The Doctor  "
+	.db	$18,"     Intro Coded By: -Pan-      "
+	.db	$18," Music Composed By: The Doctor  "
 
-	text	$1c,"              Synergy           "
-	text	$1c," +49-PRIVATE Sysop: Sigma Seven "
+	.db	$1c,"              Synergy           "
+	.db	$1c," +49-PRIVATE Sysop: Sigma Seven "
 
 
 gameover:
@@ -2708,44 +2702,43 @@ copycheatdata:
 	lda	#$00
 	phk
 	plb
-	dc.b	$5c,$00,$80,$00		: <- jump to game!!
+	;.db	$5c,$00,$80,$00		: <- jump to game!!
 
 
 
 menutxt:
-	
-	dc.b	"   Unlimited Lives:      Yes    "
-	dc.b	"   Unlimited Health:     Yes    "
-	dc.b	"   In-Game Buttons:      Yes    "
-	dc.b	"      Read Scroll Text For      "
-	dc.b	"         In-Game Buttons        "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"                                "
-	dc.b	"         Putty Squad +3         "
-	dc.b	"     Original by Mad Turnip     "
-	dc.b    "     Trained By -Pan- + TWK     "
-	dc.b    "                                "
+	.db	"   Unlimited Lives:      Yes    "
+	.db	"   Unlimited Health:     Yes    "
+	.db	"   In-Game Buttons:      Yes    "
+	.db	"      Read Scroll Text For      "
+	.db	"         In-Game Buttons        "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"                                "
+	.db	"         Putty Squad +3         "
+	.db	"     Original by Mad Turnip     "
+	.db    "     Trained By -Pan- + TWK     "
+	.db    "                                "
 
 	; 0 = yellow
 	; 1 = yellow/green
@@ -2757,35 +2750,39 @@ menutxt:
 	; 7 = brown
 
 scrolltext:
-	dc.b	" #%1-putty squad- %0was released and trained by %7anthrox%0 on %54-30-95%0  "
-	dc.b	"  $we greet these fine groups: #Censor   Cyberforce   Elite   Nightfall "
-	dc.b	"and others that TWK forgot!         $the in game butts be: "
-	dc.b	"sel+top left = level skip    sel+top right = open all doors  sel+a = select item 1  "
-	dc.b	"     # %4 see ya!!      %1-pan-     "
-	dc.b	"                           ",0
+	.db	" #%1-putty squad- %0was released and "
+    .db "trained by %7anthrox%0 on %54-30-95%0  "
+	.db	"  $we greet these fine groups: #Censor   "
+    .db "Cyberforce   Elite   Nightfall "
+	.db	"and others that TWK forgot!         "
+    .db "$the in game butts be: "
+	.db	"sel+top left = level skip    sel+top right = "
+    .db "open all doors  sel+a = select item 1  "
+	.db	"     # %4 see ya!!      %1-pan-     "
+	.db	"                           ",0
 
 
 
 options:
-	dc.b	3		;<- # of options
+	.db	3		;<- # of options
 Type:                              
-        dc.b    0,0,0,0,0,0,0,0,0,0,0,0,1  
+        .db    0,0,0,0,0,0,0,0,0,0,0,0,1  
                                    
 Min:                               
-        dc.b    1,0,1,1,0,1,1,1,3,0,0,0,1
+        .db    1,0,1,1,0,1,1,1,3,0,0,0,1
                                    
 Max:                               
-        dc.b    9,5,5,5,5,6,1,1,1,1,1,1,12 
+        .db    9,5,5,5,5,6,1,1,1,1,1,1,12 
                                    
 Begin:                             
-        dc.b    2,4,4,1,0,1,1,1,3,0,0,0,1  
+        .db    2,4,4,1,0,1,1,1,3,0,0,0,1  
 
 
 
 Slow:
 	php
 	sep	#$30
-	dc.b	$af,$00,$00,$70
+	.db	$af,$00,$00,$70
 	and	#$01
 	eor	#$01
 	sta	$420d
@@ -2796,45 +2793,45 @@ Slow:
 
 
 Cheat:
-	dc.b	$ad,$18,$42
-	dc.b	$85,$7a
+	.db	$ad,$18,$42
+	.db	$85,$7a
 	pha
 	php
 	sep	#$30
-	dc.b	$af,$01,$80,$70
+	.db	$af,$01,$80,$70
 	beq	Livesoff
 	lda	#$09
 	sta	$1da1
 	sta	$1da3
 Livesoff:
-	dc.b	$af,$02,$80,$70
+	.db	$af,$02,$80,$70
 	beq	Damage
 	lda	#$0a
 	sta	$1d09
 	sta	$1d0b
 
 Damage:
-	;dc.b	$af,$03,$80,$70
+	;.db	$af,$03,$80,$70
 	;beq	noammo
 	;lda	#$99
 	;sta	$1096
 noammo:
-	dc.b	$af,$03,$80,$70
+	.db	$af,$03,$80,$70
 	beq	nohyper
 	lda	#$01
 	sta	$1db1
 	sta	$1db3
 
 nohyper:
-	dc.b	$af,$04,$80,$70
+	.db	$af,$04,$80,$70
 	beq	nothingy
 	lda	#$01
-	dc.b	$8f,$e0,$65,$7e
+	.db	$8f,$e0,$65,$7e
 nothingy:
-	;dc.b	$af,$05,$80,$70
+	;.db	$af,$05,$80,$70
 	;beq	nojumpy
 	;rep	#$30
-	;dc.b	$a5,$7a
+	;.db	$a5,$7a
 	;cmp	#$2020
 	;bne	nojumpy
 	;stz	$7a
@@ -2851,16 +2848,16 @@ Time1:
 
 	php
 	sep	#$20
-	dc.b	$af,$03,$80,$70
+	.db	$af,$03,$80,$70
 	beq	timeoff
 	plp
-	dc.b	$5c,$ab,$89,$01
+	.db	$5c,$ab,$89,$01
 	rtl
 timeoff:
 	plp
-	dc.b	$a9,$e5,$04
-	dc.b	$85,$e9
-	dc.b	$5c,$9f,$89,$01
+	.db	$a9,$e5,$04
+	.db	$85,$e9
+	.db	$5c,$9f,$89,$01
 	;rtl
 LEVEL:
 
@@ -2868,13 +2865,13 @@ LEVEL:
 	bne	levelhere2
 	bra	levelhere
 levelthing:
-	dc.b	$5c,$7d,$9e,$1d
+	.db	$5c,$7d,$9e,$1d
 
 
 levelhere:
 	php
 	rep	#$30
-	dc.b	$af,$0c,$00,$70
+	.db	$af,$0c,$00,$70
 	and	#$00ff
 	dec a
 	asl a
@@ -2884,36 +2881,36 @@ levelhere:
 	plp
 	lda	>$7e1a03
 	beq	levelthing
-	dc.b	$5c,$95,$9e,$1d
+	.db	$5c,$95,$9e,$1d
 
 levelhere2:
 	lda	$7e1a03
-	dc.b	$5c,$95,$9e,$1d
+	.db	$5c,$95,$9e,$1d
 	rtl
 
 leveljunk:
-	dcr.w	$8,$b,$14,$1d,$29,$33
+	.dw	$8,$b,$14,$1d,$29,$33
 
 IRQ:
-	;dc.b	$ee,$c6,$ec
-	;dc.b	$af,$10,$42,$00
+	;.db	$ee,$c6,$ec
+	;.db	$af,$10,$42,$00
 	pha
 	php
 	sep	#$20
-	dc.b	$af,$00,$00,$70
+	.db	$af,$00,$00,$70
 	beq	IRQnrg
 	lda	#$03
 	sta	>$7e0035
 	sta	>$7e0037
 IRQnrg:
-	dc.b	$af,$01,$00,$70
+	.db	$af,$01,$00,$70
 	beq	IRQtime
 
 	lda	#$4e
 	sta	>$7e0026
 	sta	>$7e0028
 IRQtime:
-	dc.b	$af,$02,$00,$70
+	.db	$af,$02,$00,$70
 	bne	IRQinvul
 
 
@@ -3055,7 +3052,6 @@ noitemsel2:
 
 
 
-	org	$fffc	;reset vector in 6502 mode
-	dcr.w	Start
-	.pad
+	;.org	$fffc	;reset vector in 6502 mode
+	;.dw	Start
 
