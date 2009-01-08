@@ -1,0 +1,5 @@
+spx_aft  = amiga frequency table (period lookup)
+spx_aftf = amiga frequency table (frequency lookup)
+spx_lft  = linear frequency table (frequency lookup)
+spx_core = xmsnes spc driver
+spx_corem= modified driver for spc output

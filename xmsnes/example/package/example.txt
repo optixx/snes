@@ -1,0 +1,24 @@
+# example script
+
+# 12 character description
+# don't forget new line at end of script, its picky!!
+desc=sandwich
+
+/samples
+
+hh.wav
+ow.wav
+sd.wav
+OWWW.wav
+
+/songs
+
+war4.xm
+tae.mod
+journey.xm
+sone2.xm
+rusina.s3m
+
+/output
+
+test.xmp
