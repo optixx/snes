@@ -8,18 +8,16 @@ LD=wlalink
 OBJS=sprite.o
 APP=sprite.smc
 GFX=biker.pic
+EMU=/Applications/ZSNES.app/Contents/MacOS/ZSNES
 
 all: clean $(APP)
 
-run:$(APP)
-	zsnes $(APP)
+run:  
+	$(EMU) $(APP)
+
 
 linkfile:
 	echo "[objects]" > linkerfile.prj
-
-
-biker.pic: biker.pcx
-	wine tools/Pcx2Snes -s32 -c16 -o16 -n biker
 
 
 
