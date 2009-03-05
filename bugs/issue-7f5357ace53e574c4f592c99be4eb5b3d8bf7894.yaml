@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: get antinhero working
+desc: get the demo working
+type: :task
+component: snes
+release: 
+reporter: optixx <david@optixx.org>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-05 12:54:24.119465 Z
+references: []
+
+id: 7f5357ace53e574c4f592c99be4eb5b3d8bf7894
+log_events: 
+- - 2009-03-05 12:54:29.655327 Z
+  - optixx <david@optixx.org>
+  - created
+  - ""
