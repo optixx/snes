@@ -1,17 +1,21 @@
 # SDK Config
 
-SDK=/home/david/.wine/drive_c/65xx_FreeSDK
-#SDK=/Users/david/.wine/drive_c/65xx_FreeSDK
+SDK=/Users/david/Devel/arch/snes/devkit
+SDK=/Users/david/.wine/drive_c/65xx_FreeSDK
 
-CC=wine $(SDK)/bin/WDC816CC.exe
-AS=wine $(SDK)/bin/WDC816AS.exe
-LD=wine $(SDK)/bin/WDCLN.exe
+WINE=/opt/local/bin/wine
+#WINE=wine.sh
+
+CC=$(WINE) $(SDK)/bin/WDC816CC.exe
+AS=$(WINE) $(SDK)/bin/WDC816AS.exe
+LD=$(WINE) $(SDK)/bin/WDCLN.exe
+
 EMU=/Applications/ZSNES.app/Contents/MacOS/ZSNES 
 
 # External Tools
 
-PADBIN=wine tools/padbin.exe
-PCX2SNES=wine tools/Pcx2Snes.exe
+PADBIN=$(WINE) tools/padbin.exe
+PCX2SNES=$(WINE) tools/Pcx2Snes.exe
 
 # Project
 

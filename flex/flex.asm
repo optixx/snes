@@ -165,16 +165,21 @@ Flexdraw:
 	rep	#$30	; Setze Akku auf 16 Bit
 	lda	SINE,y	; Lese SINE-daten an der Stelle y in den Akku
 	and	#$00ff	; Lösche das High Byte
+	;adc #$00ea
 	tay			; Schreibe Akku ins Y-Register
+
+Flexdraw02:	
 	sep	#$20	; Setze Akku auf 8 Bit
 	lda	$7ea000,x	; Lese das aktuelle Byte der Grafik des            ; aktuellen Buchstaben ein
 	sta	[$10],y	; Speichere es an der Stelle, die der SINE-       ; Offset vorgibt. [$10] ist Speicherindirekt,  ; gespeichert wird also an der Stelle im        ; Speicher, die in der Speicherstelle 10h      ; steht.
 	inx		; Hole das nächste Byte
-	inc	$100c	; Erhöhe den SINE-Offset des Zeichens
+	;inc	$100c	; Erhöhe den SINE-Offset des Zeichens
+	iny
 	inc	$1002	; Erhöhe den Zeilencounter des aktuellen       ; Buchstaben
 	lda	$1002	; Lade den Zeilencounter
-	cmp	#$10	; Prüfe, ob 16 Zeilen gezeichnet wurden
-	bne	Flexdraw	; Wenn nicht, springe zu Flexdraw
+	cmp	#$12	; Prüfe, ob 16 Zeilen gezeichnet wurden
+	;bne	Flexdraw	; Wenn nicht, springe zu Flexdraw
+	bne	Flexdraw02	; Wenn nicht, springe zu Flexdraw
 	
 	stz	$1002	; Setze den Zeilencounter auf null
 	inc	$1004	; Erhöhe den Buchstabencounter
@@ -310,7 +315,8 @@ drawflexpattern:
 	ldx	#$0000	; Setze den Spaltenzähler wieder zurück
 	inc	$1000	; Erhöhe den Zeilenzähler um 1
 	lda	$1000	; Lade aktuelles Byte (Nächste Zeile, erste    ; Spalte)
-	cmp	#$08	; Prüfe, ob alle Zeilen bearbeitet wurden
+	
+	cmp	#$0c	; Prüfe, ob alle Zeilen bearbeitet wurden
 	bne	drawchar	; Wenn nicht, springe zu drawchar
 	rts
 
@@ -327,6 +333,7 @@ clearram:
 	bne	clearram	; Wenn nicht, springe zu clearram
 
 	ldx	#$0000	; Setze X wieder auf null
+
 clearscrolltext:
 	lda	#$20	; Lade den Akku mit 20h (Der Wert steht für ein ; Leerzeichen)
 	sta	$7e7000,x	; Schreibe den Wert in die Speicherstelle      ; 7e7000 + X
