@@ -1,3 +1,5 @@
+
+
 ; Dieses Programm zeigt einen Text auf dem Bildschirm an, der über den     ; Bildschirm scrollt und sich dabei dreht. Der Text wird endlos angezeigt, ; wiederholt sich also.
 
 .include "header.inc"			
@@ -9,8 +11,12 @@ VBlank:
 .bank 0
 .section "MainCode"	; Der Code des Programms befindet sich in der  ; Speicherbank 0 des ROM
 
-; Die Startroutine schreibt einige Initialisierungen, um die Textanzeige zu ; ermöglichen. Dann werden einige Unterprogramme aufgerufen, die den RAM   ; entsprechend vorbereiten und die Buchstaben und Farben kopieren.
-; Gleichzeitig werden verschiedene Zähler definiert, die für die           ; Textanzeige benötigt werden. Zuletzt wird eine Endlosschleife gestartet, ; die die Textanzeige am laufen hält.
+; Die Startroutine schreibt einige Initialisierungen, um die Textanzeige zu 
+; ermöglichen. Dann werden einige Unterprogramme aufgerufen, die den RAM   
+; entsprechend vorbereiten und die Buchstaben und Farben kopieren.
+; Gleichzeitig werden verschiedene Zähler definiert, die für die           
+; Textanzeige benötigt werden. Zuletzt wird eine Endlosschleife gestartet, 
+; die die Textanzeige am laufen hält.
 Start:  
 	Snes_Init	; Aufruf der Initialisierung des Emulators
 	rep     #$10	; X, Y-Register auf 16 Bite Breite
@@ -66,18 +72,26 @@ Start:
 	lda	#$0f
 	sta	$2100	; Bildschirm an, höchste Helligkeit
 Waitloop:
-	jsr	WaitVb	; Starte die WaitVb-Routine, um sicher zu sein, ; das neue Daten gesendet werden können
-	jsr	Routines	; Starte die Berechnung und Übertragung neuer  ; Daten
-	bra	Waitloop	; Springe wieder zu Waitloop, um den Prozess   ; erneut zu starten
+	jsr	WaitVb	; Starte die WaitVb-Routine, um sicher zu sein, 
+				; das neue Daten gesendet werden können
+	jsr	Routines	; Starte die Berechnung und Übertragung neuer  
+					; Daten
+	bra	Waitloop	; Springe wieder zu Waitloop, um den Prozess   
+					; erneut zu starten
 
-; Routines ist eine Sammelfunktion, in der der DMA-Prozess vom Speicher in ; den VRAM angestossen wird. Weiterhin werden hier die Funktionen, die für ; die Anzeige des Textes benötigt werden, aufgerufen.
+; Routines ist eine Sammelfunktion, in der der DMA-Prozess vom Speicher in 
+; den VRAM angestossen wird. Weiterhin werden hier die Funktionen, die für 
+; die Anzeige des Textes benötigt werden, aufgerufen.
 Routines:
 	rep	#$10	; Setze X,Y-Register auf 16 Bit
 	sep	#$20	; Setze Akku auf 8 Bit
 
-; Start der allgemeinen DMA Routine zum Kopieren der Grafikdaten in die ; Ausgabe. Start eines DMA-Prozesses, der die Daten, die angezeigt      ; werden sollen, vom RAM des SNES in den VRAM schreibt.
+; Start der allgemeinen DMA Routine zum Kopieren der Grafikdaten in die 
+; Ausgabe. Start eines DMA-Prozesses, der die Daten, die angezeigt      
+; werden sollen, vom RAM des SNES in den VRAM schreibt.
 	lda	#$00
-	sta	$4330	; initialisiere Befehlsregister des vierten    ; DMA-Controllers		
+	sta	$4330	; initialisiere Befehlsregister des vierten    
+				; DMA-Controllers		
 	lda	#$18
 	sta	$4331	; Setze Zieladresse auf VRAM
 	lda	#$00
@@ -93,198 +107,269 @@ Routines:
 	ldx	#$0000
 	stx	$2116	; Setzt Zieladresse im VRAM auf 0h
 	lda	#$08		
-	sta	$420b	; Startet DMA-Übertragungsprozess mit dem      ; vierten DMA-Controller
+	sta	$420b	; Startet DMA-Übertragungsprozess mit dem      
+				; vierten DMA-Controller
 	lda	#$80	
 	sta	$2115	; Autoinkrement Adresse im Grafik-RAM um 80h
 
 	lda	$1010	; Lade aktuellen Scrolloffset im Buchstaben
 	sta	$210d	; Scrolle den Bildschirm um diesen Offset
-	stz 	$210d	; Setze den Scrolloffset auf null, um flackern ; zu verhindern
-	jsr	Scroll	; Die Scrollroutine setzt den Scrolloffset neu, ; so das der Text weiter scrollt. Weiterhin    ; schreibt sie die Buchstaben, die angezeigt   ; werden sollen, in den Speicher.
-	jsr	Flex	; Die Flex-Routine lässt die Buchstaben in     ; einer Sinuskurve schwingen und ist           ; gleichzeitig dafür zuständig, das die         ; Buchstaben zeilenweise in den Speicherbereich ; kopiert werden, aus dem sie später die DMA-   ; Routine in den VRAM kopiert.
+	stz $210d	; Setze den Scrolloffset auf null, um flackern 
+				; zu verhindern
+	jsr	Scroll	; Die Scrollroutine setzt den Scrolloffset neu, 
+				; so das der Text weiter scrollt. Weiterhin    
+				; schreibt sie die Buchstaben, die angezeigt   
+				; werden sollen, in den Speicher.
+	jsr	Flex	; Die Flex-Routine lässt die Buchstaben in     
+				; einer Sinuskurve schwingen und ist           
+				; gleichzeitig dafür zuständig, das die         
+				; Buchstaben zeilenweise in den Speicherbereich 
+				; kopiert werden, aus dem sie später die DMA-   
+				; Routine in den VRAM kopiert.
 	rts
 
 
-; Die Scrollroutine ist dazu da, den Text in den Speicher zu schreiben, der ; aktuell angezeigt werden soll. Gleichzeitig berechnet sie, welcher Text  ; angezeigt wird, wenn der Text über den Bildschirm scrollt.
+; Die Scrollroutine ist dazu da, den Text in den Speicher zu schreiben, der 
+; aktuell angezeigt werden soll. Gleichzeitig berechnet sie, welcher Text  
+; angezeigt wird, wenn der Text über den Bildschirm scrollt.
+
 Scroll:
 	lda	$1010	; Lade aktuellen Scrolloffset im Buchstaben
 	clc
 	adc	#$01	; Erhöhe um 1
 	sta	$1010	; Speichere den erhöhten Offset
-	cmp	#$08	; Prüfe, ob über einen Buchstaben gescrollt    ; wurde
+	cmp	#$08	; Prüfe, ob über einen Buchstaben gescrollt    
+				; wurde
 	bcs	scrolltexts	; Wenn ja, springe zu scrolltexts
 	rts
 scrolltexts:
-	stz	$1010	; Setze aktuellen Scrolloffset im Buchstaben   ; auf null
+	stz	$1010	; Setze aktuellen Scrolloffset im Buchstaben   
+				; auf null
 	ldy	$1012	; Lade Scrolloffset im Text ins Y-Register
-	ldx	#$0000	; Lade das X-Register mit null als Counter für ; den Text, der auf dem Bildschirm ausgegeben  ; wird
+	ldx	#$0000	; Lade das X-Register mit null als Counter für 
+				; den Text, der auf dem Bildschirm ausgegeben  ; wird
 copyscroll:
-	lda	TEXT,y	; Lade den ersten anzuzeigenden Buchstaben in  ; den Akku
-	sta	$7e7000,x	; Speichere den Buchstaben im RAM an der Stelle ; 7e7000h + X
-	iny		; Zähle den Counter für den Text hoch
-	cpy #$0040	; Prüfe, ob der Text zuende ist (der Text hat  ; momentan 32 Zeichen)
-	beq endtext	; Wenn ja, springe zu endtext
+	lda	TEXT,y		; Lade den ersten anzuzeigenden Buchstaben in  
+					; den Akku
+	sta	$7e7000,x	; Speichere den Buchstaben im RAM an der Stelle 
+					; 7e7000h + X
+	iny				; Zähle den Counter für den Text hoch
+	cpy #$0040		; Prüfe, ob der Text zuende ist (der Text hat  
+					; momentan 32 Zeichen)
+	beq endtext		; Wenn ja, springe zu endtext
 moveon:
-	inx		; Zähle die Counter für die Anzeige hoch
-	cpx	#$0020	; Prüfe, ob die Anzeige schon voll ist (der    ; Bildschirm ist 16 Zeichen breit)
-	bne	copyscroll	; Wenn noch nicht alle Zeichen ausgegeben      ; wurden, starte die Funktion neu
-	ldy	$1012	; Hole aktuellen Text-Offset
-	iny		; Erhöhe ihn um 1
-	cpy #$0040	; Prüfe, ob der Text zuende ist
+	inx				; Zähle die Counter für die Anzeige hoch
+	cpx	#$0020		; Prüfe, ob die Anzeige schon voll ist (der    
+					; Bildschirm ist 16 Zeichen breit)
+	bne	copyscroll	; Wenn noch nicht alle Zeichen ausgegeben      
+					; wurden, starte die Funktion neu
+	ldy	$1012		; Hole aktuellen Text-Offset
+	iny				; Erhöhe ihn um 1
+	cpy #$0040		; Prüfe, ob der Text zuende ist
 	beq endtext2	; Wenn ja, springe zu endtext
 moveon2:
-	sty	$1012	; Speichere den erhöhten Offset
+	sty	$1012		; Speichere den erhöhten Offset
 	rts
 endtext:
-	ldy	#$0000	; Lade den Counter für den Text neu
+	ldy	#$0000		; Lade den Counter für den Text neu
 	bra	moveon	
 endtext2:
-	ldy	#$0000	; Lade den Counter für den Text neu
+	ldy	#$0000		; Lade den Counter für den Text neu
 	bra	moveon2	
 
 
-; Die Flex-Routine lässt die Buchstaben in einer Sinuskurve schwingen und  ; ist gleichzeitig dafür zuständig, dass die Buchstaben zeilenweise in den ; Speicherbereich kopiert werden, aus dem sie später die DMA-Routine in den ; VRAM kopiert.
+; Die Flex-Routine lässt die Buchstaben in einer Sinuskurve schwingen und  
+; ist gleichzeitig dafür zuständig, dass die Buchstaben zeilenweise in den 
+; Speicherbereich kopiert werden, aus dem sie später die DMA-Routine in den 
+; VRAM kopiert.
 Flex:
-	ldy	$100a	; Lese den aktuellen Absolut-SINE-Offset in Y  ; ein
-	sty	$100e	; Speichere ihn, zur Verwendung für die        ; Erstellung aller Buchstaben
+	ldy	$100a		; Lese den aktuellen Absolut-SINE-Offset in Y  
+					; ein
+	sty	$100e		; Speichere ihn, zur Verwendung für die        
+					; Erstellung aller Buchstaben
 Flex1:
-	ldy	$100e	; Lese den SINE-Offset der Zeile in Y ein
-	sty	$100c	; Speichere ihn, zur Verwendung für die        ; Erstellung eines Buchstaben
-	ldx	$1008	; Lese den aktuellen Text-Offset in X ein
-	rep	#$30	; Setze Akku auf 16 Bit
+	ldy	$100e		; Lese den SINE-Offset der Zeile in Y ein
+	sty	$100c		; Speichere ihn, zur Verwendung für die        
+					; Erstellung eines Buchstaben
+	ldx	$1008		; Lese den aktuellen Text-Offset in X ein
+	rep	#$30		; Setze Akku auf 16 Bit
 	lda	$7e7000,x	; Lese nächsten anzuzeigenden Buchstaben
-	and	#$003f	; Konvertiere das Format von ASCII zu C64-     ; Format und Lösche das High Byte
-	asl 	a	; Nun wird der Wert vier mal mit 2 malgenommen 
-	asl 	a	; (um 1 nach links geschoben) um seine 
-	asl 	a	; Entsprechung im Charset zu finden, da jeder 
-	asl 	a	; Buchstabe im Charset 16 Byte groß ist.
-	sta	$1006	; Speichere den Wert
-	tax			; Schreibe den Wert vom Akku ins X-Register
+	and	#$003f		; Konvertiere das Format von ASCII zu C64-     
+					; Format und Lösche das High Byte
+	asl 	a		; Nun wird der Wert vier mal mit 2 malgenommen 
+	asl 	a		; (um 1 nach links geschoben) um seine 
+	asl 	a		; Entsprechung im Charset zu finden, da jeder 
+	asl 	a		; Buchstabe im Charset 16 Byte groß ist.
+	sta	$1006		; Speichere den Wert
+	tax				; Schreibe den Wert vom Akku ins X-Register
 Flexdraw:
-	ldy	$100c	; Lese den SINE-Offset für den aktuellen          ; Buchstaben in Y ein
-	rep	#$30	; Setze Akku auf 16 Bit
-	lda	SINE,y	; Lese SINE-daten an der Stelle y in den Akku
-	and	#$00ff	; Lösche das High Byte
-	;adc #$00ea
-	tay			; Schreibe Akku ins Y-Register
+	ldy	$100c		; Lese den SINE-Offset für den aktuellen          
+					; Buchstaben in Y ein
+	rep	#$30		; Setze Akku auf 16 Bit
+	lda	SINE,y		; Lese SINE-daten an der Stelle y in den Akku
+	and	#$00ff		; Lösche das High Byte
+	adc #$0000
+	tay				; Schreibe Akku ins Y-Register
 
 Flexdraw02:	
-	sep	#$20	; Setze Akku auf 8 Bit
-	lda	$7ea000,x	; Lese das aktuelle Byte der Grafik des            ; aktuellen Buchstaben ein
-	sta	[$10],y	; Speichere es an der Stelle, die der SINE-       ; Offset vorgibt. [$10] ist Speicherindirekt,  ; gespeichert wird also an der Stelle im        ; Speicher, die in der Speicherstelle 10h      ; steht.
-	inx		; Hole das nächste Byte
+	sep	#$20		; Setze Akku auf 8 Bit
+	lda	$7ea000,x	; Lese das aktuelle Byte der Grafik des            
+					; aktuellen Buchstaben ein
+	sta	[$10],y		; Speichere es an der Stelle, die der SINE-       
+					; Offset vorgibt. [$10] ist Speicherindirekt,  
+					; gespeichert wird also an der Stelle im        
+					; Speicher, die in der Speicherstelle 10h      
+					; steht.
+	inx				; Hole das nächste Byte
 	;inc	$100c	; Erhöhe den SINE-Offset des Zeichens
 	iny
-	inc	$1002	; Erhöhe den Zeilencounter des aktuellen       ; Buchstaben
-	lda	$1002	; Lade den Zeilencounter
-	cmp	#$12	; Prüfe, ob 16 Zeilen gezeichnet wurden
+	inc	$1002		; Erhöhe den Zeilencounter des aktuellen       
+					; Buchstaben
+	lda	$1002		; Lade den Zeilencounter
+	cmp	#$12		; Prüfe, ob 16 Zeilen gezeichnet wurden
 	;bne	Flexdraw	; Wenn nicht, springe zu Flexdraw
 	bne	Flexdraw02	; Wenn nicht, springe zu Flexdraw
 	
-	stz	$1002	; Setze den Zeilencounter auf null
-	inc	$1004	; Erhöhe den Buchstabencounter
-	lda	$1004	; Lade den Buchstabencounter
-	cmp	#$20	; Prüfe, ob 32 Buchstaben gezeichnet wurden
-	beq	enddraw	; Wenn ja, springe zu enddraw
-	rep	#$30	; Setze Akku auf 16 Bit
-	lda	$10		; Lade den wert der Adresse 10h
-	clc			; Lösche das Carry-Flag
-	adc	#$0040	; Erhöhe die Adresse im Akku um 40h, also um    ; ein Zeichen. Jede Spalte ist 64 Byte hoch,   ; das ist aus der SINE-Tabelle ersichtlich. 64 ; dezimal sind 40h, und somit muss für die       ; nächste Spalte der Wert um 40h erhöht werden.
-	sta	$10		; Speichere den Wert wieder in 10h
-	sep	#$20	; Setze Akku auf 8 Bit
+	stz	$1002		; Setze den Zeilencounter auf null
+	inc	$1004		; Erhöhe den Buchstabencounter
+	lda	$1004		; Lade den Buchstabencounter
+	cmp	#$20		; Prüfe, ob 32 Buchstaben gezeichnet wurden
+	beq	enddraw		; Wenn ja, springe zu enddraw
+	rep	#$30		; Setze Akku auf 16 Bit
+	lda	$10			; Lade den wert der Adresse 10h
+	clc				; Lösche das Carry-Flag
+	adc	#$0040		; Erhöhe die Adresse im Akku um 40h, also um    
+					; ein Zeichen. Jede Spalte ist 64 Byte hoch,   
+					; das ist aus der SINE-Tabelle ersichtlich. 64 
+					; dezimal sind 40h, und somit muss für die       
+					; nächste Spalte der Wert um 40h erhöht werden.
+	sta	$10			; Speichere den Wert wieder in 10h
+	sep	#$20		; Setze Akku auf 8 Bit
 	
-	lda	$100e	; Lade den SINE-Offset der Zeile in den Akku
-	clc			; Lösche das Carry-Flag
-	adc	#$fe	; Verringere den SINE-Offset um 2
-	sta	$100e	; Speichere den Zeilenoffset wieder
-	inc	$1008	; Erhöhe den Text-Offset um 1, um das nächste  ; Zeichen zu lesen
-	bra	Flex1	; springe zu Flex1
+	lda	$100e		; Lade den SINE-Offset der Zeile in den Akku
+	clc				; Lösche das Carry-Flag
+	adc	#$fe		; Verringere den SINE-Offset um 2
+	sta	$100e		; Speichere den Zeilenoffset wieder
+	inc	$1008		; Erhöhe den Text-Offset um 1, um das nächste  
+					; Zeichen zu lesen
+	bra	Flex1		; springe zu Flex1
 enddraw:
 	lda	#$00		
 	sta	$10			
 	lda	#$80		
-	sta	$11	; Lade den Wert 8000h in 10-11h. 12h ändert    ; sich nicht
-	stz	$1008	; Setze den Text-Offset auf null zurück
-	stz	$1004	; Setze den Buchstabencounter auf null zurück
+	sta	$11			; Lade den Wert 8000h in 10-11h. 12h ändert    
+					; sich nicht
+	stz	$1008		; Setze den Text-Offset auf null zurück
+	stz	$1004		; Setze den Buchstabencounter auf null zurück
 	inc	$100a	
-	inc	$100a	; Erhöhe den Absolut-SINE-Offset um 2
+	inc	$100a		; Erhöhe den Absolut-SINE-Offset um 2
 	rts
 
 
-; Die WaitVb (Virtual Blank) Routine wartet, bis der Bildschirm mit neuen   ; Daten versorgt werden kann.
+; Die WaitVb (Virtual Blank) Routine wartet, bis der Bildschirm mit neuen   
+; Daten versorgt werden kann.
 WaitVb:	
-	lda	$4210	; Hier wird das NMI-Flag zurückgesetzt, indem  ; es gelesen wird. Dadurch wird ein NMI-Prozess ; angestossen, an dessen Ende das Flag wieder   ; gesetzt wird. Dieser Prozess ist             ; erforderlich, um die Anzeige neu schreiben zu ; können.
-	bpl WaitVb	; Das NMI-Flag soll high sein. Sollte das nicht ; der Fall sein, 
-			; springt bpl zu WaitVb.
+	lda	$4210	; Hier wird das NMI-Flag zurückgesetzt, indem  
+				; es gelesen wird. Dadurch wird ein NMI-Prozess 
+				; angestossen, an dessen Ende das Flag wieder   
+				; gesetzt wird. Dieser Prozess ist             
+				; erforderlich, um die Anzeige neu schreiben zu 
+				; können.
+	bpl WaitVb	; Das NMI-Flag soll high sein. Sollte das nicht 
+				; der Fall sein, 
+				; springt bpl zu WaitVb.
 	rts
 
 
-; Diese Funktion leert den VRAM und schreibt das Buchstaben-Charset hinein, ; damit später die Buchstaben anhand dieses Charsets auf dem Bildschim     ; angezeigt werden können.
+; Diese Funktion leert den VRAM und schreibt das Buchstaben-Charset hinein, 
+; damit später die Buchstaben anhand dieses Charsets auf dem Bildschim     
+; angezeigt werden können.
 Copy_Gfx:
 	ldx	#$0000		
 Clearvr:
-	stx	$2116	; Wähle VRAM-Adresse durch das X-Register
+	stx	$2116		; Wähle VRAM-Adresse durch das X-Register
 	stz	$2118		
-	stz	$2119	; Lösche die Daten des VRAM an der Stelle
-	inx		; Erhöhe das X-Register
-	cpx	#$0000	; Prüfe, ob X wieder null erreicht hat
-	bne	Clearvr	; Ist der RAM noch nicht zuende, springe zu    ; Clearvr
+	stz	$2119		; Lösche die Daten des VRAM an der Stelle
+	inx				; Erhöhe das X-Register
+	cpx	#$0000		; Prüfe, ob X wieder null erreicht hat
+	bne	Clearvr		; Ist der RAM noch nicht zuende, springe zu    
+					; Clearvr
 
-	ldx	#$0000	; Lade X mit null
-	txy		; Kopiere null auch nach Y
+	ldx	#$0000		; Lade X mit null
+	txy				; Kopiere null auch nach Y
 Chardouble:			
 	lda	Charset,y	; Lese das Y-te Byte des Charset on den Akku
-	sta	$7ea000,x	; Speichere das Byte im RAM, an der Stelle     ; 7ea000h + X
-	inx		; Erhöhe X um 1
-	sta	$7ea000,x	; Speichere dasselbe Byte im RAM um eine Stelle ; im RAM weiter. Dadurch wird jeder Buchstabe   ; doppelt so hoch
-	inx		; Erhöhe X um 1
-	iny		; Erhöhe Y um 1
-	cpy	#$0200	; Prüfe ob alle Bytes aller Buchstaben gelesen ; wurden
-	bne	Chardouble	; Wenn noch nicht alle Bytes gelesen wurden,   ; springe zu Chardouble
+	sta	$7ea000,x	; Speichere das Byte im RAM, an der Stelle     
+					; 7ea000h + X
+	inx				; Erhöhe X um 1
+	sta	$7ea000,x	; Speichere dasselbe Byte im RAM um eine Stelle 
+					; im RAM weiter. Dadurch wird jeder Buchstabe   
+					; doppelt so hoch
+	inx				; Erhöhe X um 1
+	iny				; Erhöhe Y um 1
+	cpy	#$0200		; Prüfe ob alle Bytes aller Buchstaben gelesen 
+					; wurden
+	bne	Chardouble	; Wenn noch nicht alle Bytes gelesen wurden,   
+					; springe zu Chardouble
 	rts
 	
 
-; Diese Funktion kopiert die verwendeten Farben für Hintergrund und Schrift ; in den Farb-RAM Die Farben sind 16 Bit lang und im 0rrrrrgggggbbbbb-     ; Format gespeichert (0: nicht relevant, r: rot, g: grün, b: blau)
+; Diese Funktion kopiert die verwendeten Farben für Hintergrund und Schrift 
+; in den Farb-RAM Die Farben sind 16 Bit lang und im 0rrrrrgggggbbbbb-     
+; Format gespeichert (0: nicht relevant, r: rot, g: grün, b: blau)
 Copy_colors:
-	stz	$2121	; Adresse 00h im Farb-RAM
-	lda	#$FD	; High Byte des Hintergrundes
+	stz	$2121		; Adresse 00h im Farb-RAM
+	lda	#$FD		; High Byte des Hintergrundes
 	sta	$2122
-	lda	#$FF	; Low Byte des Hintergrundes
+	lda	#$FF		; Low Byte des Hintergrundes
 	sta	$2122
-	lda	#$7C	; High Byte der Textfarbe
+	lda	#$7C		; High Byte der Textfarbe
 	sta	$2122
-	lda	#$00	; Low Byte der Textfarbe
+	lda	#$00		; Low Byte der Textfarbe
 	sta	$2122
 	rts
 
 
-; Diese Funktion löscht die genutzten Hintergründe, indem sie sie mit      ; leeren Tiles füllt. Danach werden neue Tiles definiert, die später mit    ; den Werten für die Buchstaben gefüllt werden sollen.
+; Diese Funktion löscht die genutzten Hintergründe, indem sie sie mit      
+; leeren Tiles füllt. Danach werden neue Tiles definiert, die später mit    
+; den Werten für die Buchstaben gefüllt werden sollen.
 Make_tiles:
 	ldx	#$7400			
-	stx	$2116	; Wähle die Adresse 7400h im VRAM aus          ; (Hintergrund 1)
-			; Auf diesem Hintergrund wird d. Text angezeigt
-	ldx	#$0000	; Initialisiere X als Counter
+	stx	$2116		; Wähle die Adresse 7400h im VRAM aus          
+					; (Hintergrund 1)
+					; Auf diesem Hintergrund wird d. Text angezeigt
+	ldx	#$0000		; Initialisiere X als Counter
 clearscreen:
 	lda	#$00		
 	sta	$2118		
 	lda	#$01
-	sta	$2119	; Lösche den Hintergrund, indem leere Tiles     ; genutzt werden
-	inx		; Erhöhe X
-	cpx	#$0400	; Prüfe, ob Alle Tiles des Hintergrundes        ; geleert wurden
+	sta	$2119		; Lösche den Hintergrund, indem leere Tiles     
+					; genutzt werden
+	inx				; Erhöhe X
+	cpx	#$0400		; Prüfe, ob Alle Tiles des Hintergrundes        
+					; geleert wurden
 	bne	clearscreen	; Wenn nicht, springe zu clearscreen
 	ldx	#$7800		
-	stx	$2116	; Wähle die Adresse 7800h im VRAM aus          ; (Hintergrund 2). Dieser Hintergrund ist nicht ; zu sehen, ausser am rechten Rand, wenn der   ; erste Hintergrund verschoben wird.
-	ldx	#$0000	; Initialisiere X als Counter
+	stx	$2116		; Wähle die Adresse 7800h im VRAM aus          
+					; (Hintergrund 2). Dieser Hintergrund ist nicht 
+					; zu sehen, ausser am rechten Rand, wenn der   
+					; erste Hintergrund verschoben wird.
+	ldx	#$0000		; Initialisiere X als Counter
 clearscreen2:
 	lda	#$00
 	sta	$2118		
 	lda	#$01		
-	sta	$2119	; Lösche den Hintergrund, indem leere Tiles    ; genutzt werden
-	inx		; Erhöhe X
-	cpx	#$0400	; Prüfe, ob Alle Tiles des Hintergrundes       ; geleert wurden
+	sta	$2119		; Lösche den Hintergrund, indem leere Tiles    
+					; genutzt werden
+	inx				; Erhöhe X
+	cpx	#$04 
+					; Prüfe, ob Alle Tiles des Hintergrundes       
+					; geleert wurden
 	bne	clearscreen2	; Wenn nicht, springe zu clearscreen2
 
-; Dieser Teil initialisiert die Tiles, auf denen später der Text       ; dargestellt wird. Die Tiles haben einen Inhalt, der für das weitere   ; nicht relevant ist, und wie folgt aussieht:
+; Dieser Teil initialisiert die Tiles, auf denen später der Text       
+; dargestellt wird. Die Tiles haben einen Inhalt, der für das weitere   
+; nicht relevant ist, und wie folgt aussieht:
 	;    00h   08h   10h ... (32 Spalten Breite)
 	;    01h   09h   11h ...
 	;    02h   0Ah   12h ...
@@ -295,50 +380,61 @@ clearscreen2:
 	;    07h   0Fh   17h ...
 	
 	ldx	#$7540		
-	stx	$2116	; Wähle die Adresse 7540h im VRAM aus
-	ldx	#$0000	; Initialisiere X als Spaltenzähler
+	stx	$2116		; Wähle die Adresse 7540h im VRAM aus
+	ldx	#$0000		; Initialisiere X als Spaltenzähler
 drawchar:
-	lda	$1000	; Lade den Wert des Zeilenzählers (Erste Zeile, ; erste Spalte) in den Akku
-	sta	$1001	; Speichere den Akku zur späteren Verwendung
+	lda	$1000		; Lade den Wert des Zeilenzählers (Erste Zeile, 
+					; erste Spalte) in den Akku
+	sta	$1001		; Speichere den Akku zur späteren Verwendung
 drawflexpattern:
-	lda	$1001	; Lade das aktuelle Byte
-	sta	$2118	; Schreibe es in den VRAM
-	stz	$2119	; Keine Farbpalette dazu auswählen
-	lda	$1001	; Lade das aktuelle Byte nochmal
+	lda	$1001		; Lade das aktuelle Byte
+	sta	$2118		; Schreibe es in den VRAM
+	stz	$2119		; Keine Farbpalette dazu auswählen
+	lda	$1001		; Lade das aktuelle Byte nochmal
 	clc
-	adc	#$08	; Erhöhe das Byte um 8, um die nächste Zeile zu ; erhalten. Die Zählreihenfolge ist vertikal,  ; deswegen müssen 7 Byte übersprungen werden,  ; um bei einer Spaltenhöhe von 8 Byte in       ; dieselbe Zeile der nächsten Spalte zu         ; gelangen
-	sta	$1001	; Aktuelles Byte rückspeichern
-	inx		; Spaltenzähler erhöhen
-	cpx	#$0020	; Prüfe, ob alle 32 Spalten bearbeitet wurden
+	adc	#$08		; Erhöhe das Byte um 8, um die nächste Zeile zu 
+					; erhalten. Die Zählreihenfolge ist vertikal,  
+					; deswegen müssen 7 Byte übersprungen werden,  
+					; um bei einer Spaltenhöhe von 8 Byte in       
+					; dieselbe Zeile der nächsten Spalte zu         
+					; gelangen
+	sta	$1001		; Aktuelles Byte rückspeichern
+	inx				; Spaltenzähler erhöhen
+	cpx	#$0020		; Prüfe, ob alle 32 Spalten bearbeitet wurden
 	bne	drawflexpattern
-			; Wenn nicht, springe zu drawflexpattern
-	ldx	#$0000	; Setze den Spaltenzähler wieder zurück
-	inc	$1000	; Erhöhe den Zeilenzähler um 1
-	lda	$1000	; Lade aktuelles Byte (Nächste Zeile, erste    ; Spalte)
+					; Wenn nicht, springe zu drawflexpattern
+	ldx	#$0000		; Setze den Spaltenzähler wieder zurück
+	inc	$1000		; Erhöhe den Zeilenzähler um 1
+	lda	$1000		; Lade aktuelles Byte (Nächste Zeile, erste    
+					; Spalte)
 	
-	cmp	#$0c	; Prüfe, ob alle Zeilen bearbeitet wurden
+	cmp	#$0c		; Prüfe, ob alle Zeilen bearbeitet wurden
 	bne	drawchar	; Wenn nicht, springe zu drawchar
 	rts
 
 
-; Diese Funktion löscht alle relevanten Bereiche im RAM. Der Bereich       ; 7e8000h - 7e8800h ist für die Grafikdaten des anzuzeigenden Textes,
+; Diese Funktion löscht alle relevanten Bereiche im RAM. Der Bereich       
+; 7e8000h - 7e8800h ist für die Grafikdaten des anzuzeigenden Textes,
 ; der Bereich 7e7000h - 7e7020h speichert die Buchstaben in Rohform.
+
 Clear_ram:
-	ldx	#$0000	; Lade X mit null
+	ldx	#$0000		; Lade X mit null
 clearram:
-	lda	#$00	; Lade Akku mit null
+	lda	#$00		; Lade Akku mit null
 	sta	$7e8000,x	; Speichere null an der Stelle 7e8000h + X
-	inx		; Erhöhe X
-	cpx	#$0800	; Prüfe, ob der komplette Bereich geleert wurde
+	inx				; Erhöhe X
+	cpx	#$0800		; Prüfe, ob der komplette Bereich geleert wurde
 	bne	clearram	; Wenn nicht, springe zu clearram
 
-	ldx	#$0000	; Setze X wieder auf null
+	ldx	#$0000		; Setze X wieder auf null
 
 clearscrolltext:
-	lda	#$20	; Lade den Akku mit 20h (Der Wert steht für ein ; Leerzeichen)
-	sta	$7e7000,x	; Schreibe den Wert in die Speicherstelle      ; 7e7000 + X
-	inx		; Erhöhe X
-	cpx	#$0040	; Prüfe ob alle Werte, in denen Text           ; gespeichert wird, überschrieben wurden
+	lda	#$20		; Lade den Akku mit 20h (Der Wert steht für ein ; Leerzeichen)
+	sta	$7e7000,x	; Schreibe den Wert in die Speicherstelle      
+					; 7e7000 + X
+	inx				; Erhöhe X
+	cpx	#$0040		; Prüfe ob alle Werte, in denen Text           
+					; gespeichert wird, überschrieben wurden
 	bne	clearscrolltext	; Wenn nicht, springe zu clearscrolltext
 	rts
 
@@ -361,8 +457,77 @@ SINE:
 
 
 ; Dies sind die Buchstaben, die später auf dem Bildschirm angezeigt werden. 
-; Das Charset wurde mit dem Cyber Font-Editor V1.4 erstellt, das aber      ; leider nicht kostenlos zu bekommen ist.
+; Das Charset wurde mit dem Cyber Font-Editor V1.4 erstellt, das aber      
+; leider nicht kostenlos zu bekommen ist.
 Charset:
+;============================================================================
+;= Cyber Font-Editor V1.4  Rel. by Frantic (c) 1991-1992 Sanity Productions =
+;============================================================================
+	.db	$55,$aa,$55,$aa,$55,$aa,$55,$aa	;'@'0
+	.db	$00,$3c,$66,$7e,$66,$66,$66,$00	;'A'1
+	.db	$00,$7c,$66,$7c,$66,$66,$7c,$00	;'B'2
+	.db	$00,$3c,$66,$60,$60,$66,$3c,$00	;'C'3
+	.db	$00,$78,$6c,$66,$66,$6c,$78,$00	;'D'4
+	.db	$00,$7e,$60,$78,$60,$60,$7e,$00	;'E'5
+	.db	$00,$7e,$60,$78,$60,$60,$60,$00	;'F'6
+	.db	$00,$3c,$66,$60,$6e,$66,$3c,$00	;'G'7
+	.db	$00,$66,$66,$7e,$66,$66,$66,$00	;'H'8
+	.db	$00,$3c,$18,$18,$18,$18,$3c,$00	;'I'9
+	.db	$00,$1e,$0c,$0c,$0c,$6c,$38,$00	;'J'10
+	.db	$00,$6c,$78,$70,$78,$6c,$66,$00	;'K'12
+	.db	$00,$60,$60,$60,$60,$60,$7e,$00	;'L'12
+	.db	$00,$63,$77,$7f,$6b,$63,$63,$00	;'M'13
+	.db	$00,$66,$76,$7e,$7e,$6e,$66,$00	;'N'14
+	.db	$00,$3c,$66,$66,$66,$66,$3c,$00	;'O'15
+	.db	$00,$7c,$66,$66,$7c,$60,$60,$00	;'P'16
+	.db	$00,$3c,$66,$66,$66,$3c,$0e,$00	;'Q'17
+	.db	$00,$7c,$66,$66,$7c,$6c,$66,$00	;'R'18
+	.db	$00,$3e,$60,$3c,$06,$66,$3c,$00	;'S'19
+	.db	$00,$7e,$18,$18,$18,$18,$18,$00	;'T'20
+	.db	$00,$66,$66,$66,$66,$66,$3c,$00	;'U'21
+	.db	$00,$66,$66,$66,$66,$3c,$18,$00	;'V'22
+	.db	$00,$63,$63,$6b,$7f,$77,$63,$00	;'W'23
+	.db	$00,$66,$3c,$18,$3c,$66,$66,$00	;'X'24
+	.db	$00,$66,$66,$3c,$18,$18,$18,$00	;'Y'25
+	.db	$00,$7e,$0c,$18,$30,$60,$7e,$00	;'Z'26
+	.db	$00,$3c,$30,$30,$30,$30,$3c,$00	;'['27
+	.db	$c0,$60,$30,$18,$0c,$06,$03,$00	;'|'28
+	.db	$00,$3c,$0c,$0c,$0c,$0c,$3c,$00	;']'29
+	.db	$10,$38,$6c,$c6,$00,$00,$00,$00	;'^'30
+	.db	$00,$00,$00,$00,$00,$00,$00,$fe	;'_'31
+	.db	$00,$00,$00,$00,$00,$00,$00,$00	;' '32
+	.db	$00,$18,$18,$18,$00,$00,$18,$00	;'!'33
+	.db	$00,$66,$66,$00,$00,$00,$00,$00	;'"'34
+	.db	$00,$66,$ff,$66,$ff,$66,$00,$00	;'#'35
+	.db	$00,$08,$1c,$28,$28,$1c,$08,$00	;'$'36
+	.db	$00,$64,$6c,$18,$30,$6c,$4c,$00	;'%'37
+	.db	$00,$00,$18,$18,$7e,$18,$18,$00	;'&'38
+	.db	$00,$0c,$18,$00,$00,$00,$00,$00	;'''39
+	.db	$00,$18,$30,$30,$30,$18,$0c,$00	;'('40
+	.db	$00,$18,$0c,$0c,$0c,$18,$30,$00	;')'41
+	.db	$00,$66,$3c,$ff,$3c,$66,$00,$00	;'*'42
+	.db	$00,$18,$18,$7e,$18,$18,$00,$00	;'+'43
+	.db	$00,$00,$00,$00,$00,$18,$18,$30	;','44
+	.db	$00,$00,$00,$fe,$00,$00,$00,$00	;'-'45
+	.db	$00,$00,$00,$00,$00,$18,$18,$00	;'.'46
+	.db	$03,$06,$0c,$18,$30,$60,$c0,$00	;'/'47
+	.db	$00,$3c,$66,$6e,$76,$66,$3c,$00	;'0'48
+	.db	$00,$18,$38,$18,$18,$18,$7e,$00	;'1'49
+	.db	$00,$7c,$06,$0c,$30,$60,$7e,$00	;'2'50
+	.db	$00,$7e,$06,$1c,$06,$66,$3c,$00	;'3'
+	.db	$00,$0e,$1e,$36,$7f,$06,$06,$00	;'4'
+	.db	$00,$7e,$60,$7c,$06,$66,$3c,$00	;'5'
+	.db	$00,$3e,$60,$7c,$66,$66,$3c,$00	;'6'
+	.db	$00,$7e,$06,$0c,$0c,$0c,$0c,$00	;'7'
+	.db	$00,$3c,$66,$3c,$66,$66,$3c,$00	;'8'
+	.db	$00,$3c,$66,$3e,$06,$66,$3c,$00	;'9'
+	.db	$00,$00,$18,$00,$00,$18,$00,$00	;':'
+	.db	$00,$00,$18,$00,$00,$18,$18,$30	;';'
+	.db	$18,$18,$18,$18,$18,$18,$18,$00	;'<'
+	.db	$00,$00,$7e,$00,$7e,$00,$00,$00	;'='
+	.db	$18,$18,$0c,$0c,$0c,$0c,$18,$18	;'>'
+	.db	$00,$7c,$06,$0c,$18,$00,$18,$00	;'?'
+
 ;==========================================================================
 ; Cyber Font-Editor V1.4  Rel. by Frantic (c) 1991-1992 Sanity Productions 
 ;==========================================================================
@@ -434,7 +599,8 @@ Charset:
 
 ; Dieser Text wird auf dem Bildschirm angezeigt. Es kann jeder beliebige   ; Text angezeigt werden, solange die Zeichen im Charset vorhanden sind, und ; die Länge in der Scrollfumktion entsprechend eingetragen ist.
 TEXT:
-	.db	"   DIES IST EIN SCROLLENDER TEXT"
-	.db 	". UND DAS TOLLSTE IST, ER DREHT "
+	.db	"ABC OPTIXX ABC ABC "
+	.db	"ABC OPTIXX ABC ABC "
+	.db	"ABC OPTIXX ABC ABC "
 	
 .ends

@@ -6,7 +6,7 @@ AS=wla-65816
 LD=wlalink
 
 OBJS=flex.o
-APP=slex.smc
+APP=flex.smc
 EMU=/Applications/ZSNES.app/Contents/MacOS/ZSNES
 
 all: clean $(APP)
@@ -15,6 +15,7 @@ zsnes::
 	$(EMU) $(APP)
 bsnes:
 	open /Applications/BSNES.app $(APP)
+run: bsnes
 
 linkfile:
 	echo "[objects]" > linkerfile.prj
