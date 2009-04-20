@@ -1,0 +1,7 @@
+*.obj
+*.smc
+*.swc
+*.o
+*.map
+*.prj
+.DS_*

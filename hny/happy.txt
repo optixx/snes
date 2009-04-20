@@ -1,0 +1,122 @@
+Hi Folks! It's been a while since I've done anything and a lot of peeps
+bugged me about doing "How To Code SNES volume 2", but screw it :)
+
+Instead I've decided to do something different and still let ya play with
+the source codes.
+ 
+
+Included in this archive are 2 simple demos.
+
+the first demo uses:
+
+Mode 2  (2 16 color planes, with the ability to change vertical/horizontal
+         offset for each column)
+HDMA    (2 channels controlling 2121 and 2122 for colors)
+GDMA    (1 channel to copy sprite data to sprite ram)
+Music   (taken from Bio-Metal US Final. this song is easy to use in any demo)
+Sprites (controls 32 sprites on the screen and makes it move in a circular
+         pattern and bounce off invisible borders.. got the idea of it after
+         seeing it done on some old BROS demo on the C64..  simple to do..)
+Joypad  (to control some functions of the demo, like song selection, changing
+         sine patterns..)
+NMI     (uses vertical blank interrupt, much easier to use instead of waiting
+         for vertical blanks constantly..)
+
+the second demo uses:
+
+Mode 0  ( 1 1 color plane with flexing scroller)
+GDMA    ( transfers 2k during vertical blank)
+
+
+
+The source codes are very nice and informative, almost every line has a
+description of what it is doing!
+ 
+
+They were assembled using SASM v1.4 (unregistered '030 version) and should
+easily be converted for use on any other cross-assembler out there.
+No macros were used since I'm not sure how other assemblers would use macros.
+I wanted them to convert easily to other assemblers.
+ 
+some things you might need to watch out for:
+dcr.w = takes a word like $8000 and reverses it to $00,$80
+        (65xx works backwards..)
+        this is an assembler instruction which might be different on another
+        assembler
+ 
+commands such as:
+jsl >song = the ">" means to read a 24 bit address. This command is standard
+            and should work on all assemblers, if not then get a different
+            assembler! :)
+
+.bin = includes a binary file
+
+.pad = fills up a bank with zeros so it can get to the next bank
+
+heap = stack size
+
+size = number of bank/blocks to create
+
+SMC+ = make SMC header
+
+lrom = lo-rom
+
+
+Ok that's about enuff of troubleshooting..
+
+Software used to create the Happy New Year demo:
+
+SASM 1.4 by Florian W. Sauer & Stefan M. Schulze;Infernal Byte, INC.
+IFF2SNES by Morris of Focus
+SINEGEN V1.2  by  ·STARRAY of the MECHANICAL MINDS INC
+                  ·CAD MANGO of ITALIAN BAD BOYS
+SUPER MAGIC DISASSEMBLER by -Pan- of Anthrox (me! needed for ripping sound)
+CLOANTO PERSONAL PAINT (and a disk full of fonts)
+
+Software used to create the Flex demo:
+
+SASM 1.4 by Florian W. Sauer & Stefan M. Schulze;Infernal Byte, INC.
+CYBER FONT-EDITOR V1.4  Rel. by Frantic (c) 1991-1992 Sanity Productions
+SINEGEN V1.2  by  ·STARRAY of the MECHANICAL MINDS INC
+                  ·CAD MANGO of ITALIAN BAD BOYS
+
+
+
+Hardware used to create the demos:
+
+Amiga 4000/040
+Super ProCom    (the Wildcard was too buggy with the PC-LINK..)
+NTSC SNES
+
+
+Thanks to Loverman for the nice account...  that way I could leech Bio-Metal!
+
+
+included in this archive:
+
+happy.smc = happy new year demo to use on your copier (oops, BACKUP-SYSTEM)
+happy.s   = source code for the happy new year demo
+happy.dat = happy new year 1994 graphics (converted to SNES 16 color format
+                                          using IFF2SNES)
+char.dat  = character set (letter font) also converted to SNES 16 colors
+song      = song binary data ripped from BIO-METAL and relocated to bank #$02
+            disassemble demo starting at $028000 to see music setup routine
+happy.txt = this text
+flex.s    = source code for Flex demo
+flex.smc  = flex demo to use on your copier (err.. BACKUP-SYSTEM)
+FILE_ID.DIZ = description for uploading to other boards..
+ 
+Everything else you can DELETE as it's just an advert for a board!
+
+
+
+=============================================================================
+          Now that you see how to code SNES, get your ass moving in 1994!
+
+                              -Pan-/Anthrox
+=============================================================================
+
+                          For hardware please call:
+
+                               718-630-9869
+
