@@ -5,3 +5,5 @@
 *.map
 *.prj
 .DS_*
+*.o
+*.map
