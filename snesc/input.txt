@@ -1,0 +1,77 @@
+const unsigned int TR_BUTTON		= 0x0010;
+const unsigned int TL_BUTTON		= 0x0020;
+const unsigned int Y_BUTTON		= 0x0040;
+const unsigned int X_BUTTON		= 0x0080;
+const unsigned int RIGHT_BUTTON	= 0x0100;
+const unsigned int LEFT_BUTTON	= 0x0200;
+const unsigned int DOWN_BUTTON	= 0x0400;
+const unsigned int UP_BUTTON		= 0x0800;
+const unsigned int START_BUTTON	= 0x1000;
+const unsigned int SELECT_BUTTON	= 0x2000;
+const unsigned int B_BUTTON		= 0x4000;
+const unsigned int A_BUTTON		= 0x8000;
+
+unsigned int getjoystatus(unsigned int j) {
+  unsigned int r;
+  asm {
+    LDA j;
+    ASL;
+    TAX;
+    LDA $0221,X;
+    STA r;
+  }
+  return r;
+}
+
+void clearjoy(unsigned int j) {
+  asm {
+    LDA j;
+    ASL;
+    TAX;
+    STZ $0221,X;
+  }
+}
+
+void getmousemove(unsigned int m, signed int *x, signed int *y) {
+  signed char r1, r2;
+  asm {
+    SEP #$30;
+    STZ r1;
+    STZ r2;
+    LDA m;
+    TAX;
+    STA $004016;
+
+    LDY #$08;
+    mouse1:
+    LDA $004016,X;
+    LSR;
+    ROL r1;
+    BPL mouse12;
+    LDA #$80;
+    SEC;
+    SBC r1;
+    STA r1;
+    mouse12:
+    DEY;
+    BNE mouse1;
+
+    LDY #$08;
+    mouse2:
+    LDA $004016,X;
+    LSR;
+    ROL r2;
+    BPL mouse22;
+    LDA #$80;
+    SEC;
+    SBC r2;
+    STA r2;
+    mouse22:
+    DEY;
+    BNE mouse2;
+
+    REP #$30;
+  }
+  *x += r2;
+  *y += r1;
+}

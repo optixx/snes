@@ -1,0 +1,599 @@
+	SIZE	1
+
+	
+	ORG	$8000
+	index	16
+
+	SEI
+	phk
+	plb
+	clc
+	php
+	sep	#$30
+	LDA	#$8F
+	STA	$48
+	STA	$2100
+	STZ	$2101
+	STZ	$2102
+	STZ	$2103
+	STZ	$2104
+	STZ	$2105
+	STZ	$2106
+	STZ	$2107
+	STZ	$2108
+	STZ	$2109
+	STZ	$210A
+	STZ	$210B
+	STZ	$210C
+	STZ	$210D
+	STZ	$210D
+	STZ	$210E
+	STZ	$210E
+	STZ	$210F
+	STZ	$210F
+	STZ	$2110
+	STZ	$2110
+	STZ	$2111
+	STZ	$2111
+	STZ	$2112
+	STZ	$2112
+	STZ	$2113
+	STZ	$2113
+	STZ	$2114
+	STZ	$2114
+	LDA	#$80
+	STA	$2115
+	STZ	$2116
+	STZ	$2117
+	STZ	$211A
+	STZ	$211B
+	LDA	#$ff
+	STA	$211B
+	STZ	$211C
+	STZ	$211C
+	STZ	$211D
+	STZ	$211D
+	STZ	$211E
+	LDA	#$ff
+	STA	$211E
+	STZ	$211F
+	STZ	$211F
+	STZ	$2120
+	STZ	$2120
+	STZ	$2121
+	STZ	$2123
+	STZ	$2124
+	STZ	$2125
+	STZ	$2126
+	STZ	$2127
+	STZ	$2128
+	STZ	$2129
+	STZ	$212A
+	STZ	$212B
+	STZ	$212C
+	STZ	$212D
+	STZ	$212E
+	STZ	$212F
+	LDA	#$30
+	STA	$2130
+	STZ	$2131
+	LDA	#$E0
+	STA	$2132
+	STZ	$2133
+	STZ	$4200
+	LDA	#$FF
+	STA	$4201
+	STZ	$4202
+	STZ	$4203
+	STZ	$4204
+	STZ	$4205
+	STZ	$4206
+	STZ	$4207
+	STZ	$4208
+	STZ	$4209
+	STZ	$420A
+	STZ	$420B
+	STZ	$420C
+	STZ	$420D
+	lda	#$00
+	Sta	$210d
+	Sta	$210d
+	lda	#$00
+	Sta	$2133
+	LDA	#$01
+	STA	$4212
+	PLP
+	clc
+	xce		; 16 bit mode
+	rep	#$30	; X,Y,A fixed -> 16 bit mode
+	sep	#$20	; Accumulator ->  8 bit mode
+
+	lda	#$01
+	sta	$4200
+	sta	$420b
+	sta	$420c
+
+	ldx	#$07
+lup:	stz	$210d,x
+	stz	$210d,x
+	dex
+	bpl	lup
+
+	jsr	screen_setup
+	lda	#$0f
+	sta	$2100
+	lda	#$01
+	sta	$4200
+loop:
+	lda	$0800
+	sta	$2111
+	stz	$2111
+
+	jsr	blank
+	inc	$0f00
+	dec	$1100
+	lda	$1100
+	cmp	#$01
+	bne	weiter
+	lda	#$01
+	sta	$0f00
+	lda	#$54
+	sta	$1100
+weiter:
+	jsr	scroll
+joy:
+	lda	$4212
+	and	#$01
+	bne	joy
+
+	lda	$4219
+	and	#$10
+	bne	start
+	jmp	loop
+start:
+	lda	#$0f
+	sta	$0f00
+
+lk:	lda	$0f00
+	sta	$2100
+	jsr	blank
+	jsr	blank
+	dec	$0f00
+	bne	lk
+	dc.b	$5c,$00,$80,$00
+;------------------------------------------------
+screen_setup:
+	STZ	$4200
+	LDA	#$8F		; Screen Off
+	STA	$2100		;
+	STZ	$420C		; Reset DMA Channel
+	STZ	$420B
+	lda	#$80
+	sta	$2115
+	stz	$2105
+	lda	#$01
+	sta	$2107
+	lda	#$04
+	sta	$2108
+	lda	#$09
+	sta	$2109
+	lda	#$21
+	sta	$210b
+	lda	#$02
+	sta	$210c
+
+	lda	#$07
+	sta	$212c
+
+	lda	#$ff
+	sta	$210e
+	sta	$210e
+
+	ldx	#$0000
+	stx	$2116
+	
+	lda	#$20
+del:
+	sta	$2118
+	stz	$2119
+	inx
+	cpx	#$0c00
+	bne	del
+
+	ldx	#$20
+ikl:
+	lda	#$20
+	sta	$0000,x
+	dex
+	bpl	ikl
+
+	ldx	#$0000
+	stx	$2116
+lop1:
+	lda	lores,x
+	sta	$2118
+	stz	$2119
+	inx
+	cpx	#$0100
+	bne	lop1
+	
+	ldx	#$1000
+	stx	$2116
+	ldx	#$0000
+lop2:
+	lda	$9000,x
+	sta	$2118
+	lda	$9500,x
+	sta	$2119
+	inx
+	cpx	#$0440
+	bne	lop2
+
+	ldx	#$2000
+	stx	$2116
+	ldx	#$0000
+lop3:
+	lda	$9a00,x
+	sta	$2118
+	stz	$2119
+	inx
+	cpx	#$07ff
+	bne	lop3
+
+	jsr	mov
+
+	ldx	#$0400
+	stx	$2116
+
+	ldx	#$0000
+lop4:
+	lda	screen,x
+	and	#$3f
+	sta	$2118
+	stz	$2119
+	inx
+	cpx	#$0400
+	bne	lop4
+
+	ldx	#$00ff
+delet:
+	lda	#$00
+	sta	$0c00,x		;col0
+	stz	$0d00,x
+	lda	#$01
+	sta	$0e00,x		;col1
+	stz	$0f00,x
+	lda	#$02
+	sta	$1000,x		;col2
+	stz	$1100,x
+	dex
+	bpl	delet
+
+
+	ldx	#$0000.w
+cop:
+	lda	cols,x
+	sta	$0d00,x		;col0
+	lda	cols1,x
+	sta	$0f00,x		;col1
+	lda	cols2,x
+	sta	$1100,x		;col2
+	inx
+	cpx	#$0054
+	bne	cop
+
+	lda	#$ff
+	sta	$0c00
+	sta	$0e00
+	sta	$1000
+
+	stz	$420c
+	stz	$4310
+	stz	$4330
+	stz	$4350
+
+	lda	#$02
+	sta	$4320
+	sta	$4340
+	sta	$4360
+
+	lda	#$21
+	sta	$4311
+	sta	$4331
+	sta	$4351
+	;inc	a
+	sta	$4321
+	sta	$4341
+	sta	$4361
+
+	ldx	#$0c00	;col1
+	stx	$4312
+	ldx	#$0d00	;col1
+	stx	$4322
+	ldx	#$0e00	;col1
+	stx	$4332
+	ldx	#$0f00	;col1
+	stx	$4342
+	ldx	#$1000	;col1
+	stx	$4352
+	ldx	#$1100	;col1
+	stx	$4362
+
+	stz	$4314
+	stz	$4324
+	stz	$4334
+	stz	$4344
+	stz	$4354
+	stz	$4364
+
+	lda	#$7e
+	sta	$420c
+
+	lda	#$00
+	sta	$0810
+	lda	#$01
+	sta	$080d
+	lda	#$02
+	sta	$0800
+	sta	$080b
+	stz	$080c
+	ldx	#$0000.w
+	stx	$0802
+	stz	$0801	
+	stz	$0803
+	stz	$0804
+	rts
+;-------------------------------------------------------------
+scroll:	
+	dec	$080b
+	lda	$080b
+	beq	ok1
+	rts
+
+ok1:	lda	#$01
+	sta	$080b
+	lda	$0800
+	;inc	a
+	sta	$0800
+	cmp	#$08
+	beq	roll
+	rts
+
+roll:	lda	#$00
+	sta	$0800
+
+	ldx	#$0.w
+rlop:	lda	$0001,x
+	sta	$0000,x
+	inx
+	cpx	#$20
+	bne	rlop
+txt:
+	ldx	$0802
+	lda	scrtxt,x
+	cmp	#$00
+	bne	good
+
+	ldx	#$0.w
+	stx	$0802
+
+	lda	scrtxt,x
+good:	
+	and	#$3f
+	sta	$001f
+	inc	$0802
+	bne	nol
+	inc	$0803	
+nol:
+	ldx	#$09a0
+	stx	$2116
+
+	ldx	#0.w
+rlop1:
+	lda	$0000,x
+	sta	$2118
+	stz	$2119
+	inx
+	cpx	#$20
+	bne	rlop1
+
+	lda	#$0f
+	sta	$2100
+	rts
+;-------------------------------------------------------------
+mov:
+	lda	#$03
+	sta	$2121
+	stz	$2122
+	stz	$2122
+
+	lda	#$21
+	sta	$2121
+	lda	#$73
+	sta	$2122
+	lda	#$7d
+	sta	$2122
+
+	lda	#$41
+	sta	$2121
+	lda	#$00
+	sta	$2122
+	lda	#$7d
+	sta	$2122
+	rts
+;--------------------------------------------------------------
+Blank:	lda	$4210	;RASTER LINE
+	bpl	blank
+
+blank1:	lda	$4210
+	bmi	blank1
+	rts
+;-------------------------------------------------------------
+JOYPAD:
+	lda	$4212
+	and	#$01
+	bne	joypad
+	lda	$4218
+	sta	$1000
+	lda	$4219
+	sta	$1001
+	rts
+;-------------------------------------------------------------
+cols:
+	dc.b	$18,$00,$00	;$0c01 COL0 TEXT
+	dc.b	$01,$01,$00	;$0c02 COL1 TEXT
+	dc.b	$01,$02,$00	;$0c03 COL2 TEXT
+	dc.b	$01,$03,$00	;$0c04 COL3 BKGD
+	dc.b	$01,$04,$00	;$0e01
+	dc.b	$01,$05,$00	;$0e02
+	dc.b	$01,$06,$00	;$0e03
+	dc.b	$01,$07,$00	;$0e04
+	dc.b	$01,$08,$00	;$1001
+	dc.b	$01,$09,$00	;$1002
+	dc.b	$01,$0a,$00	;$1003
+	dc.b	$01,$0b,$00	;$1004
+	dc.b	$01,$0c,$00	;$
+	dc.b	$01,$0d,$00	;$
+	dc.b	$01,$0d,$00	;$
+	dc.b	$01,$0c,$00	;$
+	dc.b	$01,$0b,$00	;$
+	dc.b	$01,$0a,$00	;$
+	dc.b	$01,$09,$00	;$0e04
+	dc.b	$01,$08,$00	;$1001
+	dc.b	$01,$07,$00	;$1002
+	dc.b	$01,$06,$00	;$1003
+	dc.b	$01,$05,$00	;$1004
+	dc.b	$01,$04,$00	;$
+	dc.b	$01,$03,$00	;$
+	dc.b	$01,$02,$00	;$
+	dc.b	$01,$01,$00	;$
+	dc.b	$01,$00,$00	;$
+
+cols1:
+	dc.b	$01,$00,$00	;$0c01 COL0 TEXT
+	dc.b	$01,$81,$00	;$0c02 COL1 TEXT
+	dc.b	$01,$82,$00	;$0c03 COL2 TEXT
+	dc.b	$01,$83,$00	;$0c04 COL3 BKGD
+	dc.b	$01,$84,$00	;$0e01
+	dc.b	$01,$85,$00	;$0e02
+	dc.b	$01,$86,$00	;$0e03
+	dc.b	$01,$87,$00	;$0e04
+	dc.b	$01,$88,$00	;$1001
+	dc.b	$01,$89,$00	;$1002
+	dc.b	$01,$8a,$00	;$1003
+	dc.b	$01,$8b,$00	;$1004
+	dc.b	$01,$8c,$00	;$
+	dc.b	$01,$8d,$00	;$
+	dc.b	$01,$8d,$00	;$
+	dc.b	$01,$8c,$00	;$
+	dc.b	$01,$8b,$00	;$
+	dc.b	$01,$8a,$00	;$
+	dc.b	$01,$89,$00	;$0e04
+	dc.b	$01,$88,$00	;$1001
+	dc.b	$01,$87,$00	;$1002
+	dc.b	$01,$86,$00	;$1003
+	dc.b	$01,$85,$00	;$1004
+	dc.b	$01,$84,$00	;$
+	dc.b	$01,$83,$00	;$
+	dc.b	$01,$82,$00	;$
+	dc.b	$01,$81,$00	;$
+	dc.b	$01,$00,$00	;$
+cols2:
+	dc.b	$72,$00,$00	;$0c01 COL0 TEXT
+	dc.b	$01,$01,$10	;$0c02 COL1 TEXT
+	dc.b	$01,$02,$10	;$0c03 COL2 TEXT
+	dc.b	$01,$03,$10	;$0c04 COL3 BKGD
+	dc.b	$01,$04,$10	;$0e01
+	dc.b	$01,$05,$10	;$0e02
+	dc.b	$01,$06,$10	;$0e03
+	dc.b	$01,$07,$10	;$0e04
+	dc.b	$01,$08,$10	;$1001
+	dc.b	$01,$09,$10	;$1002
+	dc.b	$01,$0a,$10	;$1003
+	dc.b	$01,$0b,$10	;$1004
+	dc.b	$01,$0c,$10	;$
+	dc.b	$01,$0d,$10	;$
+	dc.b	$01,$0d,$10	;$
+	dc.b	$01,$0c,$10	;$
+	dc.b	$01,$0b,$10	;$
+	dc.b	$01,$0a,$00	;$
+	dc.b	$01,$09,$10	;$0e04
+	dc.b	$01,$08,$10	;$1001
+	dc.b	$01,$07,$10	;$1002
+	dc.b	$01,$06,$10	;$1003
+	dc.b	$01,$05,$10	;$1004
+	dc.b	$01,$04,$10	;$
+	dc.b	$01,$03,$10	;$
+	dc.b	$01,$02,$10	;$
+	dc.b	$01,$01,$10	;$
+	dc.b	$01,$00,$00	;$
+
+LORES:
+	blk.b	$40,$20
+	bin	FLT.LO
+	dc.b	$20
+SCREEN:
+
+	dc.b	"                                "
+	dc.b	" HEADING TOWARDS A CENTURY WITH "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	" THE HOME OF THE REAL CRACKERS! "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"     ALIEN III - CRACKED BY     "
+	dc.b	"              THE               "
+	dc.b	"         BEST AROUND!           "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+	dc.b	"                                "
+
+
+CHAR:
+	org	$9000
+	bin	FLT.CHA
+
+CHAR1:
+	org	$9a00
+	bin CHAR  
+
+
+scrtxt:
+	dc.b	"     HOWDY..... AYATOLLAH OF ANTHROX IS HERE AGAIN THIS TIME WITH"
+	DC.B	" AN INTRO FOR FAIRLIGHT.....  I WAS DEFINATELY BORED AND SO I "
+	DC.B	"DECIDED TO CONVERT THIS FINE(?) INTRO FROM THE C-64 ONTO THE S-NES"
+	DC.B	"      I DUNNO ANYBODY FROM FAIRLIGHT ON THE S-NES BUT I AM A MEMBER OF "
+	DC.B	"THEM ON THE C-64 (BELIEVE IT OR NOT!!).. IT WAS MORE OR LESS JUST "
+	DC.B	"A TEST HOW TO MAKE SOME RASTER BARS ON THE S-NES AND I ALSO WANTED "
+	DC.B	"TO TEST MY 4 COLOURS GRAPHIC CONVERTER FROM 64 TO S-NES!! IF ANYBODY "
+	DC.B	"IS INTERESTED IN IT CALL ME AT  ++43-5223-45294 .... OR EMAIL ON "
+	DC.B	"HALLOWED POINT OR PLEASURE DOME!!  NOT MUCH TO SAY EXCEPT THAT IN "
+	DC.B	"THE LZH FILE IS THE WHOLE DATA INCLUDED WHAT IS NEEDED(THAT MEANS"
+	DC.B	" SOURCE CODE FOR FASM, GRAPHIX AND SMC FILE.) IN FUTURE CATCH SOME "
+	DC.B	"TRAINERS FROM ME AND AT THE END OF THE SUMMER MY FIRST GAME SHOULD "
+	DC.B	"BE READY....  IT SEEMS FOR ME NOW AS IF I JUST COME INTO THE S-NES "
+	DC.B	"JUST AS INTO THE 64. SO THIS INTRO TOOK ME ABOUT 5 HOURS..... "
+	DC.B	"SPECIAL GREETS GO TO:   SLAIN AND SABBER OF ANTHROX, STEVE AND BOONK"
+	DC.B	"ID OF DIAMONDS AND RUST (THANX FOR THE GAME SUPPLY!), TRADE AND "
+	DC.B	"NECRONOM OF SCOOPEX, STRIDER AND AARON OF FAIRLIGHT AND MANY MORE"
+	DC.B	" I HOPE YOU GUYS IN FAIRLIGHT USE THIS INTRO (IT IS NOT THAT BAD!!)"
+	DC.B	"  L8R     AYATOLLAH OF ANTHROX/FAIRLIGHT IS SIGNING OFF.....     "
+	DC.B	0
+
+	org	$fffc
+	dc.w	$8000

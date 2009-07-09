@@ -1,0 +1,203 @@
+void settiles(unsigned int b, unsigned char *p1, unsigned int size) {
+  asm {
+    LDA $0229;
+    AND #$003F;
+    ASL;
+    ASL;
+    ASL;
+    CLC;
+    ADC #$022A;
+    TAY;
+
+    LDA #$0000;
+    STA $0007,Y;	// assign transfer type
+   
+    // tile data
+    LDA p1;
+    STA $0000,Y;
+    LDX #$0002;
+    LDA p1,X;
+    STA $0002,Y;
+    LDA b;
+    INC;
+    XBA;
+    ASL;
+    ASL;
+    ASL;
+    ASL;
+    STA $0003,Y;
+    LDA size;
+    STA $0005,Y;
+
+    // signal the nmi to copy data to vram
+    INC $0229;
+  }
+}
+
+void setmap(unsigned int b, unsigned char *p1) {
+  asm {
+    LDA $0229;
+    AND #$003F;
+    ASL;
+    ASL;
+    ASL;
+    CLC;
+    ADC #$022A;
+    TAY;
+
+    LDA #$0000;
+    STA $0007,Y;	// assign transfer type
+   
+    // tile data
+    LDA p1;
+    STA $0000,Y;
+    LDX #$0002;
+    LDA p1,X;
+    STA $0002,Y;
+    LDA b;
+    XBA;
+    ASL;
+    ASL;
+    STA $0003,Y;
+    LDA #$0800;
+    STA $0005,Y;
+
+    // signal the nmi to copy data to vram
+    INC $0229;
+  }
+}
+
+void memcopy(unsigned char *dest, unsigned char *src, unsigned int size) {
+  asm {
+    SEP #$30;
+    LDA #$54;
+    STA $0014;
+    LDX #$02;
+    LDA dest,X;
+    STA $0015;
+    LDA src,X;
+    STA $0016;
+    LDA #$6B;
+    STA $0017;
+    REP #$30;
+    LDX src;
+    LDY dest;
+    LDA size;
+    DEC;
+    JSL $7E0014;   
+  }
+}
+
+void setpalette(unsigned char *pal) {
+  asm {
+    // color data
+    LDA #$7E54;
+    STA $0014;
+    LDX #$0002;
+    LDA pal,X;
+    STA $0016;
+    LDA #$006B;
+    STA $0017;
+    LDX pal;
+    LDY #$0600;
+    LDA #$01FF;
+    JSL $7E0014;
+
+    LDA #$0040;
+    TSB $0229;	// signal NMI to copy palette table
+  }
+}
+
+void enablescreen() {
+  asm {
+    SEP #$20;
+    LDA #$09;
+    STA $002105;	// bg mode 1
+    LDA #$04;
+    STA $002109;	// location of bg3 map
+    LDA #$01;
+    STA $00210B;	// location of bg1 & bg2 tiles
+    LDA #$02;
+    STA $00210C;	// location of bg3 & bg4 tiles
+    LDA #$15;
+    STA $00212C; 	// enable BG1, BG3, and OBJ to display
+    LDA #$0F;	// turn on the screen, full brightness 
+    STA $002100;
+  }
+}
+
+void screenmode(unsigned int m) {
+  asm {
+    SEP #$20;
+    LDA m;
+    STA $002105;
+  }
+}
+
+void setsprite(unsigned int s, unsigned char x, unsigned char y, unsigned char t, unsigned char p) {
+  asm {
+    LDA s;
+    ASL;
+    ASL;
+    TAX;
+
+    SEP #$20;
+    LDA x;
+    STA $0800,X;
+    LDA y;
+    STA $0801,X;
+    LDA t;
+    STA $0802,X;
+    LDA p;
+    STA $0803,X;
+    REP #$20;
+
+    LDA #$0080;
+    TSB $0229;	// signal NMI to copy sprite table
+  }
+}
+
+void waitforvsync() {
+  asm {
+    LDA #$0001;
+    TSB $0200;	// turn timer on
+    STZ $0201;	// reset timer
+
+  label3:
+    LDA $0201;	// wait
+    BEQ label3;
+  }
+}
+
+void delay(unsigned int d) {
+  asm {
+    LDA #$0001;
+    TSB $0200;	// turn timer on
+    STZ $0201;	// reset timer
+    
+    LDX d;    
+  label3:
+    LDA $0201;	// wait
+    BEQ label3;
+    STZ $0201;	// reset timer
+    DEX;
+    BNE label3;
+  }
+}
+
+void resettimer() {
+  asm {
+    LDA #$0001;
+    TSB $0200;	// turn timer on
+    STZ $0201;	// reset timer
+  }
+}
+
+void sync(unsigned int d) {
+  asm {    
+  label4:
+    LDA $0201;	// compare timer
+    CMP d;
+    BCC label4;
+  }
+}

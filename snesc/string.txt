@@ -1,0 +1,116 @@
+void addbcd(long *bcd, unsigned int n) {
+  unsigned int a,b,c,d;
+  asm {
+    LDA [bcd];
+    STA a;			// low
+    LDY #$0002;
+    LDA [bcd],Y;
+    STA b;			// high
+
+    LDY #$0008;
+    label0:
+      LDA a;    
+      AND #$000F;		// isolate one BCD
+      CLC;
+      ADC n;		// add n
+      STZ n;		// set carry to 0 for next digit
+      CMP #$000A;
+      BCC label1;		// if >= 10, subtract 10
+        SEC;
+        SBC #$000A;
+        INC n;		// set carry to 1 for next digit
+      label1:
+      LDX #$0004;
+      label2:
+        LSR;
+        ROR d;		// shift BCD into c and d
+        ROR c;
+        LSR b;		// move to next BCD
+        ROR a;
+        DEX;
+      BNE label2;
+      DEY;
+    BNE label0;
+
+    LDA c;			// low
+    STA [bcd];
+    LDA d;			// high
+    LDY #$0002;
+    STA [bcd],Y;
+  }
+}
+
+void writebcd(long bcd, unsigned int *map, unsigned int p, unsigned int offset) {
+  unsigned int a,b,c;
+  asm {
+    STZ c;
+    LDA bcd;	// low
+    STA a;
+    LDX #$0002;
+    LDA bcd,X;	// high
+    STA b;
+
+    LDX #$0008;
+    label1:
+      CPX #$0001;
+      BNE label4;
+        INC c;
+      label4:
+      LDA b;
+      XBA;LSR;LSR;LSR;LSR;
+      AND #$000F;
+      TAY;
+      CLC;
+      ADC c;
+      BEQ label3; 
+        TYA;
+        CLC;
+        ADC offset;    
+        LDY p;
+        STA [map],Y;
+        INC c;
+      label3:
+      LDY #$0004;
+      label2:
+        ASL a;
+        ROL b;
+        DEY;
+      BNE label2;
+      INC p; INC p;
+      DEX;
+    BNE label1;
+  }
+}
+
+void writestring(unsigned char *st, unsigned int *map, unsigned int p, unsigned int offset) {
+  unsigned int sp;
+  asm {
+    LDY #$0000;
+    LDA p;			// position
+    STA sp;			// start pos
+    start:
+      LDA [st],Y;
+      AND #$00FF;
+      BEQ end;
+      CMP #$000A;
+      BNE mid;
+        LDA sp;		// newline
+        CLC;
+        ADC #$0040;
+        STA p;
+        STA sp;
+        INY;
+        BRA start;
+      mid:
+      TYX;
+      CLC;
+      ADC offset;    
+      LDY p;
+      STA [map],Y;
+      INC p; INC p;
+      TXY;
+      INY;
+      BRA start;
+    end:
+  }
+}
