@@ -1,4 +1,4 @@
-PREFIX=/home/david/Devel/arch/snes/devkit
+PREFIX=/home/david/Devel/arch/snes/devkit-linux
 OPTIMIZE=1
 
 BINDIR=$(PREFIX)/bin
