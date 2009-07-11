@@ -15,7 +15,6 @@ ASMOBJ = data.obj graph_asm.obj str.obj
 COBJ = sine.obj input.obj init.obj graph.obj
 
 all: sine.smc
-	$(EMU) sine.smc || xset r on
 
 sine.smc: $(ASMOBJ) $(COBJ)
 	$(LD) -dvSo $(ASMOBJ) $(COBJ) sine.smc
